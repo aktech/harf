@@ -1288,13 +1288,7 @@ function renderAttach() {
 }
 
 // The + turns a quarter before the file picker opens, then turns back.
-$('attachBtn').addEventListener('click', () => {
-  const b = $('attachBtn');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { $('fileInput').click(); return; }
-  if (b.classList.contains('turn')) return;
-  b.classList.add('turn');
-  setTimeout(() => { $('fileInput').click(); b.classList.remove('turn'); }, 300);
-});
+$('attachBtn').addEventListener('click', () => $('fileInput').click());
 $('fileInput').addEventListener('change', (e) => { addFiles([...e.target.files]); e.target.value = ''; });
 input.addEventListener('paste', (e) => {
   const files = [...(e.clipboardData ? e.clipboardData.files : [])];

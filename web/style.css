@@ -740,12 +740,10 @@ input.rename {
   box-shadow: var(--shadow-composer);
 }
 .warning { max-width: var(--measure); margin: 10px auto 0; font-size: var(--fs-2xs); color: var(--text-3); text-align: center; }
-/* The attach key: a filled square whose + turns a quarter before the picker opens. */
+/* The attach key: a filled square that opens the file picker. */
 .composer .attach { width: 33px; height: 33px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 8px; background-color: var(--surface-2); color: var(--text-2); }
 .composer .attach:hover { color: var(--text); }
 .composer .attach svg { width: 16px; height: 16px; stroke-width: 1.8; }
-.composer .attach.turn svg { transform: rotate(90deg); transition: transform .3s cubic-bezier(.3, .1, .2, 1); }
-.composer .attach.turn { color: var(--text); }
 
 /* ---------- sheets and toast ---------- */
 .scrim { display: none; }
