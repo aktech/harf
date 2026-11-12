@@ -541,6 +541,7 @@ function renderThread() {
   renderStarters(empty);
   if (empty) {
     thread.append(welcome());
+    showJump(); // nothing to jump to; drop the key a chat left showing
     return;
   }
   const msgs = state.chat.messages;
