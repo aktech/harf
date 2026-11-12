@@ -118,6 +118,14 @@ function closed(t) {
 }
 
 // highlight colours code in a language highlight.js knows, and escapes it.
+// langOf is the language to colour a file's contents in, from its
+// extension; empty when highlight.js does not know it.
+export function langOf(path) {
+  const m = String(path || '').match(/\.([a-z0-9]+)$/i);
+  const ext = m ? m[1].toLowerCase() : '';
+  return ext && globalThis.hljs.getLanguage(ext) ? ext : '';
+}
+
 export function highlight(code, lang) {
   const { hljs } = globalThis;
   return lang && hljs.getLanguage(lang) ? hljs.highlight(code, { language: lang, ignoreIllegals: true }).value : esc(code);

@@ -1,5 +1,5 @@
 import { beam } from './avatar.js';
-import { renderMarkdown, settle } from './md.js';
+import { renderMarkdown, settle, highlight, langOf } from './md.js';
 import { markdownHooks, toolImage, fileURL, workspacePath } from './plugins.js';
 import { mountFrames } from './frames.js';
 import { statsSummary, statsDetail } from './stats.js';
@@ -684,8 +684,10 @@ function partView(p, open, streaming) {
     () => {
       const out = [];
       const args = toolArgs(t);
-      if (args) out.push(logView(t.name === 'bash' ? 'Command' : 'Input', args));
-      if (t.output) out.push(logView(status === 'error' ? 'Error' : 'Output', t.output, status === 'error'));
+      if (args) out.push(t.name === 'bash' ? logView('Command', args, false, 'bash') : logView('Input', args, false, 'json'));
+      // A file Pi read is coloured in its own language.
+      const read = t.name === 'read' ? langOf(parseArgs(t.args).path) : '';
+      if (t.output) out.push(logView(status === 'error' ? 'Error' : 'Output', t.output, status === 'error', status === 'error' ? '' : read));
       else if (status === 'running') out.push(el('div', { class: 'think-text' }, 'Waiting for output…'));
       return out;
     });
@@ -827,8 +829,12 @@ function toolArgs(t) {
   return JSON.stringify(a, null, 2);
 }
 const firstLine = (s) => String(s || '').trim().split('\n')[0];
-function logView(title, text, error) {
-  const pre = el('pre', {}, String(text).replace(/\n$/, ''));
+// logView shows a step's input or output; with lang it is syntax coloured
+// (highlight escapes everything it does not mark up).
+function logView(title, text, error, lang) {
+  const body = String(text).replace(/\n$/, '');
+  const pre = el('pre', {});
+  if (lang) pre.innerHTML = highlight(body, lang); else pre.textContent = body;
   const b = el('button', { class: 'code-copy', 'aria-label': `Copy ${title.toLowerCase()}`, title: 'Copy' }, svg(ICON.copy));
   b.addEventListener('click', () => copy(text, b));
   return el('div', { class: 'logview' + (error ? ' error' : '') }, el('div', { class: 'logview-head' }, title, b), pre);

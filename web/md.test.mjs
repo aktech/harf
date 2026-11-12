@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import './libs.mjs';
-import { renderMarkdown, settle } from './md.js';
+import { renderMarkdown, settle, highlight, langOf } from './md.js';
 
 // flat drops the line breaks between tags, so a test can compare structure.
 const flat = (src, ext) => renderMarkdown(src, ext).replace(/>\n+/g, '>').replace(/\n+</g, '<');
@@ -184,4 +184,18 @@ test('a fence names its file after the language when it gives one', () => {
   assert.match(renderMarkdown('```js title="src/app.js"\nx\n```'), /data-lang="js" data-file="src\/app.js"/);
   assert.doesNotMatch(renderMarkdown('```python\nx\n```'), /data-file/);
   assert.doesNotMatch(renderMarkdown('```python {linenos}\nx\n```'), /data-file/);
+});
+
+test('a file path names the language to colour its contents in, when known', () => {
+  assert.equal(langOf('notes/packing-list.md'), 'md');
+  assert.equal(langOf('chart.py'), 'py');
+  assert.equal(langOf('data.JSON'), 'json');
+  assert.equal(langOf('Makefile.unknownthing'), '');
+  assert.equal(langOf('README'), '');
+});
+
+test('tool input is coloured as JSON', () => {
+  const out = highlight('{\n  "path": "a.md"\n}', 'json');
+  assert.match(out, /class="hljs-attr"/);
+  assert.match(out, /class="hljs-string"/);
 });
