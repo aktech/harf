@@ -61,7 +61,8 @@
   --shadow-lg: 0 16px 48px rgba(24, 25, 18, .16), 0 2px 6px rgba(24, 25, 18, .06);
   --shadow-composer: 0 6px 24px -8px rgba(24, 25, 18, .12), 0 1px 2px rgba(24, 25, 18, .04);
   --scrim: rgba(24, 25, 18, .28);
-  --code-bg: #f4f6f1; --log-bg: #f4f6f1; --log-head: #fdfefb;
+  --code-bg: #f4f6f1; --code-head: transparent; --code-border: var(--border); --code-text: var(--text); --code-gutter: var(--text-4);
+  --log-bg: #f4f6f1; --log-head: #fdfefb;
   --code-kw: #3f6212; --code-fn: #5b21b6; --code-str: #12776e; --code-num: #2c4fd8;
   --code-com: #63655d; --code-type: #9a3412; --code-key: #9a3412;
   --log-dim: #63655d; --log-ok: #3f6212; --log-info: #2c4fd8; --log-key: #9a3412;
@@ -83,9 +84,11 @@
     --shadow-lg: 0 16px 48px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
     --shadow-composer: 0 8px 28px -10px rgba(0, 0, 0, .55), 0 1px 2px rgba(0, 0, 0, .3);
     --scrim: rgba(0, 0, 0, .56);
-    --code-bg: #1a1b17; --log-bg: #1a1b17; --log-head: #1f201c;
-    --code-kw: #a3c77d; --code-fn: #c6a8f7; --code-str: #63cbbd; --code-num: #8fb0ff;
-    --code-com: #989a8f; --code-type: #f0a868; --code-key: #f0a868;
+    /* Code in dark mode: Catppuccin Mocha (palette MIT, catppuccin.com). */
+    --code-bg: #1e1e2e; --code-head: #181825; --code-border: #313244; --code-text: #cdd6f4; --code-gutter: #6c7086;
+    --log-bg: #1a1b17; --log-head: #1f201c;
+    --code-kw: #cba6f7; --code-fn: #89b4fa; --code-str: #a6e3a1; --code-num: #fab387;
+    --code-com: #9399b2; --code-type: #f9e2af; --code-key: #b4befe;
     --log-dim: #989a8f; --log-ok: #a3c77d; --log-info: #8fb0ff; --log-key: #f0a868;
     --log-string: #63cbbd; --log-number: #c6a8f7; --log-path: #67c6dd;
     --chart-1: #8db866; --chart-2: #f08a52; --chart-3: #7f9cff; --chart-4: #e0b252;
@@ -104,9 +107,11 @@
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
   --shadow-composer: 0 8px 28px -10px rgba(0, 0, 0, .55), 0 1px 2px rgba(0, 0, 0, .3);
   --scrim: rgba(0, 0, 0, .56);
-  --code-bg: #1a1b17; --log-bg: #1a1b17; --log-head: #1f201c;
-  --code-kw: #a3c77d; --code-fn: #c6a8f7; --code-str: #63cbbd; --code-num: #8fb0ff;
-  --code-com: #989a8f; --code-type: #f0a868; --code-key: #f0a868;
+  /* Code in dark mode: Catppuccin Mocha (palette MIT, catppuccin.com). */
+  --code-bg: #1e1e2e; --code-head: #181825; --code-border: #313244; --code-text: #cdd6f4; --code-gutter: #6c7086;
+  --log-bg: #1a1b17; --log-head: #1f201c;
+  --code-kw: #cba6f7; --code-fn: #89b4fa; --code-str: #a6e3a1; --code-num: #fab387;
+  --code-com: #9399b2; --code-type: #f9e2af; --code-key: #b4befe;
   --log-dim: #989a8f; --log-ok: #a3c77d; --log-info: #8fb0ff; --log-key: #f0a868;
   --log-string: #63cbbd; --log-number: #c6a8f7; --log-path: #67c6dd;
   --chart-1: #8db866; --chart-2: #f08a52; --chart-3: #7f9cff; --chart-4: #e0b252;
@@ -644,20 +649,20 @@ input.rename {
 .md code { font: .86em/1.5 var(--font-mono); background: var(--surface-2); border-radius: 5px; padding: 1px 5px; }
 
 /* A code block: a header with its file and Copy, numbered lines below. */
-.codeblock { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--code-bg); }
+.codeblock { border: 1px solid var(--code-border); border-radius: 12px; overflow: hidden; background: var(--code-bg); }
 .code-head {
   display: flex; align-items: center; gap: 10px; height: 35px; padding: 0 10px 0 15px;
-  border-bottom: 1px solid var(--border); font: 400 var(--fs-2xs)/1 var(--font-mono);
+  border-bottom: 1px solid var(--code-border); background: var(--code-head); font: 400 var(--fs-2xs)/1 var(--font-mono);
 }
-.code-file { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.code-file { color: var(--code-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .code-lang { color: var(--text-3); white-space: nowrap; }
 .code-body { display: flex; padding: 14px 0 16px; overflow-x: auto; }
 .code-gutter {
   flex: none; min-width: 44px; padding: 0 16px 0 10px; text-align: right; white-space: pre; user-select: none;
-  font: var(--fs-xs)/23px var(--font-mono); color: var(--text-4); font-variant-numeric: tabular-nums;
+  font: var(--fs-xs)/23px var(--font-mono); color: var(--code-gutter); font-variant-numeric: tabular-nums;
 }
 .md .code-body pre { margin: 0; padding: 0 16px 0 0; flex: 1; min-width: 0; background: none; border: 0; overflow: visible; }
-.md pre code { border: 0; background: none; padding: 0; font: var(--fs-xs)/23px var(--font-mono); display: block; white-space: pre; tab-size: 4; color: var(--text); }
+.md pre code { border: 0; background: none; padding: 0; font: var(--fs-xs)/23px var(--font-mono); display: block; white-space: pre; tab-size: 4; color: var(--code-text); }
 .code-copy {
   margin-left: auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 26px; min-width: 26px; padding: 0 6px;
   border: 0; border-radius: 6px; background: none; color: var(--text-2); font: 400 var(--fs-2xs)/1 var(--font-mono);
