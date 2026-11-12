@@ -11,7 +11,7 @@ PI_SHA256_amd64 := f2e4e4329603223d03260cdb8bd5033dbdc1f73ba58ab8939db2e56546e11
 PI_SHA256_arm64 := fa5829c7ef83ffeaebba015715c8306220f89b2aa8a00154efbba98dd5440156
 SHA256SUM       := $(shell command -v sha256sum >/dev/null 2>&1 && echo sha256sum || echo shasum -a 256)
 
-.PHONY: build test run linux pi image clean
+.PHONY: build test run linux pi image dist clean
 
 build:
 	CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o bin/harf .
@@ -46,5 +46,20 @@ bin/pi-linux-%/pi/pi:
 image: linux pi
 	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE) .
 
+# Release archives: the binary with the licence and README, for each
+# platform Pi publishes a build for, plus SHA256SUMS.
+PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64
+dist:
+	rm -rf dist && mkdir -p dist
+	set -e; for p in $(PLATFORMS); do \
+	  os=$${p%/*}; arch=$${p#*/}; name=harf_$${os}_$${arch}; \
+	  mkdir -p dist/$$name; \
+	  CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -trimpath -ldflags "$(LDFLAGS)" -o dist/$$name/harf .; \
+	  cp LICENSE README.md dist/$$name/; \
+	  tar -C dist -czf dist/$$name.tar.gz $$name; \
+	  rm -rf dist/$$name; \
+	done
+	cd dist && $(SHA256SUM) *.tar.gz > SHA256SUMS
+
 clean:
-	rm -rf bin
+	rm -rf bin dist

@@ -196,7 +196,7 @@ footer nav { display: flex; gap: 24px; }
     <section class="runit" id="run" aria-labelledby="runTitle">
       <div class="run-copy">
         <h2 id="runTitle">Run it</h2>
-        <p>One command with Docker, or three from source. Then open <code>localhost:8080</code>.</p>
+        <p>One command with Docker, or download the binary for Linux or macOS. Then open <code>localhost:8080</code>.</p>
         <ul class="facts">
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/></svg><span><b>Pi is in the image.</b> Nothing else to install.</span></li>
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg><span><b>linux/amd64 and linux/arm64.</b> A laptop, a server or a Raspberry Pi.</span></li>
@@ -207,7 +207,7 @@ footer nav { display: flex; gap: 24px; }
         <div class="term-bar">
           <div class="term-tabs" role="tablist" aria-label="How to run Harf">
             <button type="button" role="tab" id="tabDocker" aria-selected="true" aria-controls="paneDocker">Docker</button>
-            <button type="button" role="tab" id="tabSource" aria-selected="false" aria-controls="paneSource" tabindex="-1">From source</button>
+            <button type="button" role="tab" id="tabSource" aria-selected="false" aria-controls="paneSource" tabindex="-1">Binary</button>
           </div>
           <button class="copy" type="button" aria-label="Copy the commands" id="termCopy"><svg class="idle" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><svg class="done" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
         </div>
@@ -216,10 +216,10 @@ footer nav { display: flex; gap: 24px; }
     <span class="f">-v</span> <span class="a">harf:/home/user</span> <span class="a">ghcr.io/aktech/harf:main</span>
 <span class="o">INFO harf listening url=http://0.0.0.0:8080 pi=/opt/pi/pi</span>
 <span class="ok">Open http://localhost:8080</span></div>
-        <div class="term-body" role="tabpanel" id="paneSource" aria-labelledby="tabSource" hidden data-copy="git clone https://github.com/aktech/harf &amp;&amp; cd harf&#10;make build&#10;./bin/harf"><span class="c"># needs Go 1.26 and Pi 1.4.0, signed in with: pi, then /login</span>
-<span class="pr">$</span> <span class="k">git</span> clone <span class="a">https://github.com/aktech/harf</span> <span class="f">&amp;&amp;</span> <span class="k">cd</span> <span class="a">harf</span>
-<span class="pr">$</span> <span class="k">make</span> build
-<span class="pr">$</span> <span class="k">./bin/harf</span>
+        <div class="term-body" role="tabpanel" id="paneSource" aria-labelledby="tabSource" hidden data-copy="curl -fsSL https://github.com/aktech/harf/releases/latest/download/harf_darwin_arm64.tar.gz | tar -xz&#10;./harf_darwin_arm64/harf"><span class="c"># needs Pi 1.4.0, signed in with: pi, then /login</span>
+<span class="c"># macOS on Apple silicon; also darwin_amd64, linux_amd64, linux_arm64</span>
+<span class="pr">$</span> <span class="k">curl</span> <span class="f">-fsSL</span> <span class="a">https://github.com/aktech/harf/releases/latest/download/harf_darwin_arm64.tar.gz</span> <span class="f">|</span> <span class="k">tar</span> <span class="f">-xz</span>
+<span class="pr">$</span> <span class="k">./harf_darwin_arm64/harf</span>
 <span class="o">INFO harf listening url=http://127.0.0.1:8080</span>
 <span class="ok">Open http://localhost:8080</span></div>
       </div>

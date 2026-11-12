@@ -39,18 +39,23 @@ For each chat Harf runs `pi --mode rpc` and streams Pi's answer to the browser. 
 
 ## Quick start
 
-Install Pi 1.4.0 and sign in (run `pi`, then `/login`) or set a provider key, then:
+Install Pi 1.4.0 and sign in (run `pi`, then `/login`) or set a provider key, then download Harf and run it:
 
 ```sh
-make build
-./bin/harf    # http://127.0.0.1:8080, with your model provider's key in the environment
+# macOS on Apple silicon; for others use darwin_amd64, linux_amd64 or linux_arm64
+curl -fsSL https://github.com/aktech/harf/releases/latest/download/harf_darwin_arm64.tar.gz | tar -xz
+./harf_darwin_arm64/harf    # http://127.0.0.1:8080
 ```
 
-Or with Docker, with your provider keys in `keys.env` as `NAME=value` lines ([which names](docs/configuration.md)):
+Each [release](https://github.com/aktech/harf/releases) lists the archives' SHA-256 hashes in `SHA256SUMS`.
+
+Or with Docker, which has Pi inside, with your provider keys in `keys.env` as `NAME=value` lines ([which names](docs/configuration.md)):
 
 ```sh
 docker run -p 8080:8080 --env-file keys.env -v harf:/home/user ghcr.io/aktech/harf:main
 ```
+
+Or from source: `make build && ./bin/harf`.
 
 > [!WARNING]
 > **Harf has no sign-in of its own**, and Pi runs commands for whoever can reach it. Keep it on localhost, or behind an authenticating reverse proxy. See [security](docs/security.md).

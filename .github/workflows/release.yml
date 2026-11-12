@@ -1,0 +1,40 @@
+name: Release
+
+# On a v* tag: builds Harf for Linux and macOS (amd64 and arm64), checks the
+# Linux build starts and answers, and publishes the archives and SHA256SUMS
+# as a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the version comes from git describe
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - run: go vet ./... && go test ./...
+      - run: make dist
+      - name: Check the Linux build starts and answers
+        run: |
+          tar -xzf "dist/harf_linux_amd64.tar.gz" -C "$RUNNER_TEMP"
+          bin="$RUNNER_TEMP/harf_linux_amd64/harf"
+          test "$("$bin" -version)" = "$GITHUB_REF_NAME"
+          HARF_PI=true "$bin" -addr 127.0.0.1:8080 -data "$RUNNER_TEMP/data" &
+          for i in $(seq 1 20); do curl -sf http://127.0.0.1:8080/healthz && break; sleep 0.5; done
+          curl -sf http://127.0.0.1:8080/healthz
+          kill %1
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.tar.gz dist/SHA256SUMS --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
