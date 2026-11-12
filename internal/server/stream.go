@@ -322,7 +322,7 @@ type sse struct {
 
 func newSSE(w http.ResponseWriter) *sse {
 	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Cache-Control", "no-cache, no-transform")
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.WriteHeader(http.StatusOK)
 	f, _ := w.(http.Flusher)
@@ -332,6 +332,15 @@ func newSSE(w http.ResponseWriter) *sse {
 func (s *sse) send(event string, v any) {
 	b, _ := json.Marshal(v)
 	fmt.Fprintf(s.w, "event: %s\ndata: %s\n\n", event, b)
+	if s.f != nil {
+		s.f.Flush()
+	}
+}
+
+// ping sends a comment line, which the browser ignores, so proxies see the
+// stream is alive.
+func (s *sse) ping() {
+	fmt.Fprint(s.w, ": ping\n\n")
 	if s.f != nil {
 		s.f.Flush()
 	}

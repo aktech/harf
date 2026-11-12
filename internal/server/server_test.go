@@ -998,3 +998,64 @@ func TestChatsWithMessagesButNoNameAreNamedAtStart(t *testing.T) {
 		t.Fatalf("an empty chat got a title %q", got)
 	}
 }
+
+// pings opens the stream at url and reads it until a ping comment comes. It
+// returns the response headers, or an error when the stream ends or stays
+// silent for a second.
+func (h *harness) pings(method, url, body string) (http.Header, error) {
+	req, _ := http.NewRequest(method, h.srv.URL+url, strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	seen := make(chan error, 1)
+	go func() {
+		sc := bufio.NewScanner(resp.Body)
+		for sc.Scan() {
+			if sc.Text() == ": ping" {
+				seen <- nil
+				return
+			}
+		}
+		seen <- errors.New("stream ended without a ping")
+	}()
+	defer resp.Body.Close()
+	select {
+	case err := <-seen:
+		return resp.Header, err
+	case <-time.After(time.Second):
+		return resp.Header, errors.New("no ping while the reply was quiet")
+	}
+}
+
+func TestQuietReplyStreamsArePingedSoProxiesKeepThemOpen(t *testing.T) {
+	old := pingEvery
+	pingEvery = 20 * time.Millisecond
+	t.Cleanup(func() { pingEvery = old })
+	h := newHarness(t, echo)
+	h.agent.block, h.agent.started = make(chan struct{}), make(chan struct{})
+	c := h.newChat(map[string]any{"title": "quiet"})
+	defer func() { close(h.agent.block); h.waitReply(c.ID) }()
+
+	type res struct {
+		hdr http.Header
+		err error
+	}
+	sent := make(chan res, 1)
+	go func() {
+		hdr, err := h.pings("POST", "/api/chats/"+c.ID+"/messages", `{"content":"one"}`)
+		sent <- res{hdr, err}
+	}()
+	<-h.agent.started
+	r := <-sent
+	if r.err != nil {
+		t.Fatalf("send: %v", r.err)
+	}
+	if cc := r.hdr.Get("Cache-Control"); !strings.Contains(cc, "no-cache") || !strings.Contains(cc, "no-transform") {
+		t.Fatalf("Cache-Control %q", cc)
+	}
+	if _, err := h.pings("GET", "/api/chats/"+c.ID+"/stream", ""); err != nil {
+		t.Fatalf("follow: %v", err)
+	}
+}

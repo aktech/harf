@@ -4,7 +4,12 @@ import (
 	"context"
 	"net/http"
 	"sync"
+	"time"
 )
+
+// pingEvery is how often a quiet reply stream gets a comment line, so a
+// proxy that cuts idle connections keeps it open.
+var pingEvery = 15 * time.Second
 
 // reply is a chat's reply while Pi writes it. It runs on its own, apart from
 // the request that started it, so leaving the page does not stop it. Every
@@ -44,9 +49,12 @@ func (r *reply) end() {
 }
 
 // follow streams every event of the reply to w, from the first, until the
-// reply ends or the page goes away.
+// reply ends or the page goes away. A quiet stream is pinged every pingEvery.
 func (r *reply) follow(w http.ResponseWriter, req *http.Request) {
 	out := newSSE(w)
+	out.ping() // sends the headers now, before the first event
+	tick := time.NewTicker(pingEvery)
+	defer tick.Stop()
 	for next := 0; ; {
 		r.mu.Lock()
 		evs, changed, ended := r.events[next:], r.changed, r.ended
@@ -60,6 +68,8 @@ func (r *reply) follow(w http.ResponseWriter, req *http.Request) {
 		}
 		select {
 		case <-changed:
+		case <-tick.C:
+			out.ping()
 		case <-req.Context().Done():
 			return
 		}
