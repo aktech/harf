@@ -164,7 +164,7 @@ svg { flex: none; }
 }
 
 /* Hover: one tint laid over a control's own background. */
-:is(.btn, .icon-btn, .row a, .agent-go, .menu button, .step summary, .msg-actions button, .code-copy, .chip-x, .att-chip, .search-trigger, .collapse-btn, .select-trigger, .seg button, .subnav a, .starter, .settings-link, .share-btn, .title-btn, .sec-add, .work-head, .attach):hover:not(:disabled, [aria-disabled="true"]),
+:is(.btn, .icon-btn, .row a, .agent-go, .menu button, .step summary, .msg-actions button, .code-copy, .chip-x, .att-chip, .search-trigger, .collapse-btn, .select-trigger, .seg button, .subnav a, .starter, .settings-link, .title-btn, .sec-add, .work-head, .attach):hover:not(:disabled, [aria-disabled="true"]),
 .menu button:focus-visible {
   background-image: linear-gradient(var(--hover-tint, var(--hover)), var(--hover-tint, var(--hover)));
 }
@@ -369,14 +369,6 @@ input.rename {
 .title-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
 .top-title input.rename { max-width: 420px; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 14px; }
-.share-btn {
-  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 12px;
-  border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); font-size: var(--fs-sm); font-weight: 400;
-}
-.share-btn svg { width: 15px; height: 15px; stroke-width: 1.8; color: var(--text-2); }
-.share-btn:disabled { color: var(--text-3); cursor: not-allowed; }
-.share-btn:disabled svg { color: var(--text-4); }
-.top.bare .share-btn { display: none; }
 
 /* Menus: a raised sheet of 34px rows. */
 .menu {
@@ -417,7 +409,7 @@ input.rename {
 .select-trigger {
   display: inline-flex; align-items: center; gap: 8px; min-width: 0; max-width: 300px; height: 33px; padding: 0 10px 0 12px;
   border: 0; border-radius: 8px; background-color: var(--surface-2);
-  color: var(--text-2); font: 400 var(--fs-sm)/normal var(--font-mono); text-align: left;
+  color: var(--text-2); font: 500 var(--fs-sm)/normal var(--font-sans); text-align: left;
 }
 .select-trigger:hover:not(:disabled) { color: var(--text); }
 /* In a form the trigger is drawn like the text inputs. */
@@ -522,7 +514,7 @@ input.rename {
   width: 28px; height: 28px; margin-top: -2px; border-radius: 7px; display: grid; place-items: center;
   background: var(--mark); color: #fff;
 }
-.msg-mark svg { width: 14px; height: 14px; fill: currentColor; stroke: none; }
+.msg-mark svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
 .msg-main { min-width: 0; }
 .msg.assistant .body { overflow-wrap: anywhere; }
 .msg.assistant .body > * + * { margin-top: 16px; }
@@ -718,7 +710,7 @@ input.rename {
 }
 .composer textarea::placeholder { color: var(--text-3); }
 .composer-row { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; min-height: 37px; }
-.composer-agent { display: flex; align-items: center; gap: 7px; font: 400 var(--fs-sm)/1 var(--font-mono); color: var(--text-2); min-width: 0; height: 33px; padding: 0 4px 0 12px; border-radius: 8px; background: var(--surface-2); }
+.composer-agent { display: flex; align-items: center; gap: 7px; font: 500 var(--fs-sm)/1 var(--font-sans); color: var(--text-2); min-width: 0; height: 33px; padding: 0 4px 0 12px; border-radius: 8px; background: var(--surface-2); }
 .composer-agent:empty { display: none; }
 .composer-agent > span { padding-right: 2px; }
 .composer-agent > span:last-child { padding-right: 8px; }
@@ -1076,15 +1068,13 @@ input.rename {
   .menu-btn, :root[data-sidebar] .menu-btn { display: inline-grid; }
   .top { padding: 0 12px 0 16px; gap: 6px; }
   .top-actions { gap: 6px; }
-  .share-btn { width: 34px; padding: 0; justify-content: center; }
-  .share-btn .lbl { display: none; }
   .select-trigger { max-width: 52vw; }
   .thread { padding: 22px 16px 32px; }
   .composer-wrap { padding: 0 12px 12px; }
   .composer { padding: 16px 12px 12px; }
   .msg.assistant { column-gap: 10px; grid-template-columns: 24px minmax(0, 1fr); }
   .msg-mark { width: 24px; height: 24px; border-radius: 6px; margin-top: 0; }
-  .msg-mark svg { width: 12px; height: 12px; }
+  .msg-mark svg { width: 15px; height: 15px; }
   .step summary { grid-template-columns: 24px auto minmax(0, 1fr) auto; padding: 0 12px; column-gap: 10px; }
   .step-body { padding: 4px 12px 12px; }
   .step > :is(.media-card, .agent-card) { margin: 2px 12px 10px; }

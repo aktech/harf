@@ -80,7 +80,6 @@ const ICON = {
   pin: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
   pinOff: '<path d="M12 17v5"/><path d="M15 9.34V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H7.89"/><path d="m2 2 20 20"/><path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h11"/>',
   download: '<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>',
-  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
   trash: '<path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   cancel: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   save: '<path d="M20 6 9 17l-5-5"/>',
@@ -370,7 +369,6 @@ function renderTitle() {
   const t = $('topTitle');
   const c = state.chat;
   const agent = currentAgent();
-  $('shareBtn').disabled = !c;
   document.title = c && c.title ? `${c.title} · Harf` : 'Harf';
   if (!$('agentsPage').hidden || !$('settingsPage').hidden) { t.replaceChildren(); return; }
   if (!c) { t.replaceChildren(agent ? el('span', { class: 'top-name' }, agent.name) : ''); return; }
@@ -384,20 +382,6 @@ function renderTitle() {
   b.addEventListener('pointerdown', (e) => e.stopPropagation());
   t.replaceChildren(b);
 }
-
-// The Share key: there is no public sharing, so it copies the chat's
-// address for someone with access to this Harf, or saves it as Markdown.
-$('shareBtn').addEventListener('pointerdown', (e) => e.stopPropagation());
-$('shareBtn').addEventListener('click', () => {
-  const b = $('shareBtn');
-  if (menuEl && menuEl.anchor === b) { closeMenu(); return; }
-  if (!state.chat) return;
-  const id = state.chat.id;
-  showMenu(b, [
-    ['Copy link', ICON.link, async () => { await copy(location.origin + location.pathname + location.search + '#c=' + id); toast('Link copied'); }],
-    ['Export as Markdown', ICON.download, () => exportChat(id)],
-  ]);
-});
 
 function renderModels() {
   const cur = currentModel();
