@@ -4,7 +4,8 @@
 
 // MAKERS, in the order they are tried: a model whose name holds two makers'
 // words (deepseek-r1-distill-qwen) is the first one's. mono logos are drawn
-// in the text colour; the others keep their own colours.
+// in the text colour; the others keep their own colours, and tint ones
+// also have parts drawn in the text colour.
 export const MAKERS = [
   { id: 'anthropic', label: 'Claude', logo: 'claude-color', words: ['claude', 'anthropic'] },
   { id: 'openai', label: 'OpenAI', logo: 'openai', mono: true, words: ['gpt', 'openai', 'chatgpt', 'codex', 'dall', 'sora', 'whisper'], pattern: /^o\d+$/ },
@@ -14,10 +15,11 @@ export const MAKERS = [
   { id: 'deepseek', label: 'DeepSeek', logo: 'deepseek-color', words: ['deepseek'] },
   { id: 'zai', label: 'Z.ai', logo: 'zai', mono: true, words: ['glm', 'chatglm', 'zhipu', 'zai', 'cogview'] },
   { id: 'mistral', label: 'Mistral', logo: 'mistral-color', words: ['mistral', 'mixtral', 'codestral', 'devstral', 'magistral', 'pixtral', 'ministral'] },
-  { id: 'xai', label: 'xAI', logo: 'xai', mono: true, words: ['grok', 'xai'] },
+  { id: 'xai', label: 'Grok', logo: 'grok', mono: true, words: ['grok', 'xai'] },
   { id: 'meta', label: 'Meta', logo: 'meta-color', words: ['llama', 'meta'] },
+  { id: 'muse', label: 'Meta Muse', logo: 'muse-color', words: ['muse'] },
   { id: 'qwen', label: 'Qwen', logo: 'qwen-color', words: ['qwen', 'qwq'] },
-  { id: 'kimi', label: 'Kimi', logo: 'kimi-color', words: ['kimi', 'moonshot', 'moonshotai'] },
+  { id: 'kimi', label: 'Kimi', logo: 'kimi-color', tint: true, words: ['kimi', 'moonshot', 'moonshotai'] },
   { id: 'minimax', label: 'MiniMax', logo: 'minimax-color', words: ['minimax', 'abab'] },
   { id: 'bfl', label: 'Black Forest Labs', logo: 'bfl', mono: true, words: ['flux', 'bfl'] },
   { id: 'microsoft', label: 'Microsoft', logo: 'microsoft-color', words: ['phi', 'microsoft', 'mai'] },
@@ -26,8 +28,9 @@ export const MAKERS = [
   { id: 'amazon', label: 'Amazon', logo: 'nova-color', words: ['nova', 'amazon'] },
   { id: 'perplexity', label: 'Perplexity', logo: 'perplexity-color', words: ['sonar', 'perplexity'] },
   { id: 'tencent', label: 'Tencent Hunyuan', logo: 'hunyuan-color', words: ['hunyuan', 'hy', 'tencent'] },
-  { id: 'meituan', label: 'Meituan LongCat', logo: 'longcat-color', words: ['longcat', 'meituan'] },
-  { id: 'stepfun', label: 'StepFun', logo: 'stepfun-color', words: ['step', 'stepfun'] },
+  { id: 'meituan', label: 'Meituan LongCat', logo: 'longcat-color', tint: true, words: ['longcat', 'meituan'] },
+  { id: 'xiaomi', label: 'Xiaomi MiMo', logo: 'xiaomimimo', mono: true, words: ['mimo', 'xiaomi'] },
+  { id: 'stepfun', label: 'StepFun', logo: 'stepfun', mono: true, words: ['step', 'stepfun'] },
 ];
 
 // Organisation names in ids (OpenRouter's middle part) that are not one of
@@ -73,13 +76,16 @@ const PROVIDER_LOGOS = {
   openai: { logo: 'openai', mono: true }, 'openai-codex': { logo: 'openai', mono: true },
   anthropic: { logo: 'anthropic', mono: true }, google: { logo: 'google-color' },
   'google-vertex': { logo: 'google-color' }, 'google-gemini-cli': { logo: 'gemini-color' },
-  'google-antigravity': { logo: 'antigravity-color' }, xai: { logo: 'xai', mono: true },
-  groq: { logo: 'groq', mono: true }, cerebras: { logo: 'cerebras-color' }, mistral: { logo: 'mistral-color' },
+  'google-antigravity': { logo: 'antigravity-color' },
+  groq: { logo: 'groq', mono: true }, cerebras: { logo: 'cerebras-color', tint: true }, mistral: { logo: 'mistral-color' },
   deepseek: { logo: 'deepseek-color' }, 'amazon-bedrock': { logo: 'bedrock-color' },
   'azure-openai-responses': { logo: 'azure-color' }, 'vercel-ai-gateway': { logo: 'vercel', mono: true },
   zai: { logo: 'zai', mono: true }, minimax: { logo: 'minimax-color' }, 'minimax-cn': { logo: 'minimax-color' },
-  huggingface: { logo: 'huggingface-color' }, 'kimi-coding': { logo: 'kimi-color' }, ollama: { logo: 'ollama', mono: true },
+  huggingface: { logo: 'huggingface-color' }, 'kimi-coding': { logo: 'kimi-color', tint: true }, ollama: { logo: 'ollama', mono: true },
 };
+
+// allLogos lists every logo the model list can show.
+export const allLogos = () => [...MAKERS, ...Object.values(PROVIDER_LOGOS)];
 
 // providerLogo is a provider's logo ("<provider> images" counts as the
 // provider), or null when it has none.

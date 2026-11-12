@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { makerOf, providerName, providerLogo } from './makers.js';
+import { readFileSync, readdirSync } from 'node:fs';
+import { makerOf, providerName, providerLogo, allLogos } from './makers.js';
 
 const maker = (id, name) => (makerOf(id, name) || {}).id || null;
 
@@ -60,4 +61,49 @@ test('known providers have their own logo, unknown ones none', () => {
   assert.equal(providerLogo('openrouter images').logo, 'openrouter');
   assert.equal(providerLogo('opencode-go').logo, 'opencode');
   assert.equal(providerLogo('some-new-host'), null);
+  // xAI's own mark has changed and no current copy is vendored.
+  assert.equal(providerLogo('xai'), null);
+});
+
+test('Qwen models carry the Qwen logo, from any host', () => {
+  assert.equal(makerOf('llama-homelab-strata/qwen3.8-flash-next-uncensored').logo, 'qwen-color');
+  assert.equal(makerOf('openrouter/qwen/qwen3-coder').logo, 'qwen-color');
+  assert.equal(makerOf('opencode-go/qwen3.8-max').logo, 'qwen-color');
+});
+
+test('Grok models carry the Grok mark', () => {
+  assert.equal(makerOf('github-copilot/grok-4.7').logo, 'grok');
+  assert.equal(makerOf('openrouter/x-ai/grok-5').logo, 'grok');
+});
+
+test('StepFun models carry its current block mark, in the text colour', () => {
+  const m = makerOf('opencode-go/step-5-preview');
+  assert.equal(m.logo, 'stepfun');
+  assert.equal(m.mono, true);
+});
+
+test('Xiaomi MiMo models carry the MiMo mark', () => {
+  assert.equal(makerOf('opencode-go/mimo-v2.6-pro', 'MiMo-V2.6-Pro').logo, 'xiaomimimo');
+  assert.equal(makerOf('openrouter/xiaomi/mimo-v2.5').logo, 'xiaomimimo');
+});
+
+test("Meta's Muse models carry the Muse mark", () => {
+  assert.equal(makerOf('opencode-go/muse-spark-1.3-contributor').logo, 'muse-color');
+});
+
+test('every logo is a vendored file, and every vendored file is used', () => {
+  const dir = new URL('./logos/', import.meta.url);
+  const used = new Set(allLogos().map((l) => l.logo));
+  const files = readdirSync(dir).filter((f) => f.endsWith('.svg')).map((f) => f.slice(0, -4));
+  assert.deepEqual([...used].sort(), files.sort());
+});
+
+test('a coloured logo with parts in the text colour is marked to take it', () => {
+  // An <img> draws currentColor black, so Kimi's K would vanish on the
+  // dark theme; tint logos are put in the page so the K takes the text colour.
+  const dir = new URL('./logos/', import.meta.url);
+  for (const l of allLogos()) {
+    const usesText = readFileSync(new URL(l.logo + '.svg', dir), 'utf8').includes('currentColor');
+    assert.equal(Boolean(l.tint), usesText && !l.mono, l.logo);
+  }
 });

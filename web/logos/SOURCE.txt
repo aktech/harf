@@ -1,5 +1,14 @@
 Model makers' logos, copied unmodified from the npm package
-@lobehub/icons-static-svg 1.102.0 (icons/), released from
-github.com/lobehub/lobe-icons at commit 989535d6c13da2dec5a2937fe2789d4af4fdd8e0.
+@lobehub/icons-static-svg 1.102.0 (icons/; tarball sha256
+ad3f2ab605d59f3968b9ea57c9b2aab941ee3608da72fca57ac6e0ded301f5a2), released
+from github.com/lobehub/lobe-icons at commit
+989535d6c13da2dec5a2937fe2789d4af4fdd8e0.
 The icon set is MIT licensed (LICENSE, from that commit). The logos are
 trademarks of their owners and are used only to name each model's maker.
+
+Each mark was compared with its owner's current one (the owner's GitHub
+organisation picture or website icon, November 2026). Qwen's is the blue
+mark the Qwen organisation now uses; StepFun's is its block mark; Grok
+models use the Grok mark. xAI's company mark has changed and this package
+has no copy of the new one, so the xAI provider has no logo. A model whose
+maker has no logo here gets none.

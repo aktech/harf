@@ -1,7 +1,7 @@
 Every icon in web/app.js and web/index.html is from lucide-static 1.63.0
 on npm (tarball sha256
 521f0d535c03b159c6ea9b475920724dee2755005ad7360fd621b9bab7bf211d), ISC licence
-in lucide-LICENSE.txt: arrow-down, arrow-up, bot, box, chart-column, check,
+in lucide-LICENSE.txt: arrow-down, arrow-up, bot, chart-column, check,
 chevron-down, chevron-up, circle-alert, copy, download, ellipsis, file,
 file-archive, file-audio, file-code, file-image, file-plus, file-spreadsheet,
 file-text, file-video, image, info, lightbulb, menu, message-square-text,

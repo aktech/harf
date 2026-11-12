@@ -76,7 +76,6 @@ const ICON = {
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   swatch: '<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>',
   server: '<rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/>',
-  cube: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
   pencilLine: '<path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
   pin: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
   pinOff: '<path d="M12 17v5"/><path d="M15 9.34V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H7.89"/><path d="m2 2 20 20"/><path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h11"/>',
@@ -159,19 +158,36 @@ const hasModel = (id) => state.models.some((m) => m.id === id);
 const modelName = (id) => (state.models.find((m) => m.id === id) || {}).name || id;
 
 // modelLogo is the logo of the company that made a model (Anthropic for
-// github-copilot/claude-haiku-4.5), or a plain cube when it is not known.
+// github-copilot/claude-haiku-4.5). A model whose maker is not known gets
+// an empty slot, not a stand-in drawing, so names stay aligned.
 // One-colour logos are masks filled with the text colour, so they follow
 // the theme; the others keep their own colours.
 function modelLogo(id, name) {
   const m = makerOf(id, name);
-  if (!m) return el('span', { class: 'mlogo generic', 'aria-hidden': 'true' }, svg(ICON.cube));
+  if (!m) return el('span', { class: 'mlogo none', 'aria-hidden': 'true' });
   return logoView(m, m.label);
 }
 
-function logoView({ logo, mono }, title) {
+// An <img> draws currentColor black, so tint logos (Kimi's K) are put in
+// the page as SVG, where those parts take the text colour.
+const tintLogos = new Map();
+function tintLogo(logo) {
+  if (!tintLogos.has(logo)) {
+    tintLogos.set(logo, fetch(`logos/${logo}.svg`).then((r) => (r.ok ? r.text() : Promise.reject(r.status)))
+      .then((t) => new DOMParser().parseFromString(t, 'image/svg+xml').documentElement));
+  }
+  return tintLogos.get(logo);
+}
+
+function logoView({ logo, mono, tint }, title) {
   if (mono) {
     const s = el('span', { class: 'mlogo mono', 'aria-hidden': 'true', title });
     s.style.setProperty('--logo', `url(logos/${logo}.svg)`);
+    return s;
+  }
+  if (tint) {
+    const s = el('span', { class: 'mlogo', 'aria-hidden': 'true', title });
+    tintLogo(logo).then((doc) => s.replaceChildren(document.importNode(doc, true)), () => {});
     return s;
   }
   return el('span', { class: 'mlogo', 'aria-hidden': 'true', title }, el('img', { src: `logos/${logo}.svg`, alt: '' }));

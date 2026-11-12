@@ -446,7 +446,7 @@ input.rename {
 .select-group + .select-group { margin-top: 4px; }
 .select-heading { padding: 8px 10px 4px; color: var(--text-3); font-size: var(--fs-2xs); font-weight: 500; }
 .select-heading:has(.mlogo) { display: flex; align-items: center; gap: 6px; }
-.select-heading .mlogo, .select-heading .mlogo img { width: 12px; height: 12px; }
+.select-heading .mlogo, .select-heading .mlogo > * { width: 12px; height: 12px; }
 .select-item {
   position: relative; display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 7px 34px 7px 10px;
   border-radius: 7px; cursor: pointer; user-select: none;
@@ -459,16 +459,15 @@ input.rename {
    colour, so they follow the theme; the others keep their own colours,
    which read on both themes. */
 .mlogo { width: 16px; height: 16px; flex: none; display: inline-grid; place-items: center; }
-.mlogo img { width: 16px; height: 16px; display: block; }
+.mlogo > * { width: 16px; height: 16px; display: block; }
 .mlogo.mono { background: currentColor; -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat; }
-.mlogo.generic { color: var(--text-3); }
-.mlogo.generic svg { width: 15px; height: 15px; stroke-width: 1.7; }
 .select-item .mlogo, .select-trigger .mlogo { color: var(--text); }
-.select-trigger .mlogo, .select-trigger .mlogo img { width: 14px; height: 14px; }
+.select-trigger .mlogo, .select-trigger .mlogo > * { width: 14px; height: 14px; }
+.select-logo:has(> .mlogo.none) { display: none; }
 .select-logo { display: inline-grid; flex: none; }
 .select-logo:empty { display: none; }
 .pal-icon .mlogo { width: 18px; height: 18px; }
-.pal-icon .mlogo img { width: 18px; height: 18px; }
+.pal-icon .mlogo > * { width: 18px; height: 18px; }
 .select-empty { padding: 18px 12px; text-align: center; color: var(--text-2); font-size: var(--fs-xs); }
 
 .scroller { flex: 1; min-height: 0; overflow-y: auto; }
