@@ -569,6 +569,9 @@ input.rename {
 }
 @keyframes sweep { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .waiting-text { color: var(--text-3); background: none; } }
+/* A reply stream that was cut and is being opened again. */
+.reconnecting { margin: 8px 0 0; color: var(--text-3); font-size: var(--fs-sm); }
+.reconnecting[hidden] { display: none; }
 
 /* ---------- what the agent did: one card per run of steps ---------- */
 .work { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; }

@@ -12,6 +12,7 @@ import { createPalette } from './palette.js';
 import { FONTS, SIZES, ACCENTS, loadAppearance, applyAppearance } from './appearance.js';
 import { parsePairs, formatPairs, mcpTool, savedAgent } from './mcp.js';
 import { fileKind } from './filekind.js';
+import { watchReply } from './stream.js';
 
 // All URLs are relative so the app works under any path prefix, as when a
 // proxy serves it at /u/<owner>/<app>/.
@@ -1020,7 +1021,8 @@ async function streamReply(chat, reply, open) {
 
   const view = $('thread').lastElementChild;
   const body = view.querySelector('.body');
-  body.replaceChildren(el('span', { class: 'waiting', role: 'status' }, waitingSpark(), el('span', { class: 'waiting-text' }, 'Thinking')));
+  const waiting = () => el('span', { class: 'waiting', role: 'status' }, waitingSpark(), el('span', { class: 'waiting-text' }, 'Thinking'));
+  body.replaceChildren(waiting());
 
   const ctrl = new AbortController();
   state.streaming = ctrl;
@@ -1071,42 +1073,53 @@ async function streamReply(chat, reply, open) {
   };
   const schedule = () => { if (!pending) { pending = true; requestAnimationFrame(paint); } };
 
-  let finished = false;
+  // A cut stream is opened again and replays the reply from its start, so
+  // what was shown is cleared first.
+  const status = el('p', { class: 'reconnecting', role: 'status', hidden: true });
+  view.append(status);
   try {
-    const res = await open(ctrl.signal);
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || `${res.status} ${res.statusText}`);
-    }
-    if (res.status === 204) {
-      // The reply ended before we got here: show the saved copy.
-      finished = true;
-      await resync(chat.id);
-      return done();
-    }
-    await readEvents(res.body, (event, data) => {
-      if (event === 'part') {
-        if (data.part) reply.parts[data.index] = data.part;
-        if (data.delta && reply.parts[data.index]) reply.parts[data.index].text = (reply.parts[data.index].text || '') + data.delta;
-        dirty.add(data.index);
-        schedule();
-      } else if (event === 'done') {
-        Object.assign(reply, data);
-        finished = true;
-        done();
-      } else if (event === 'title') {
-        chat.title = data.title;
-        upsertChat({ ...chat, updatedAt: new Date().toISOString() });
-        renderChats();
-        if (state.chat && state.chat.id === chat.id) renderTitle();
-      } else if (event === 'error') {
-        reply.error = data.error;
-      }
+    await watchReply({
+      open,
+      reopen: (signal) => fetch(`api/chats/${chat.id}/stream`, { signal }),
+      loadSaved: () => loadSaved(chat.id),
+      signal: ctrl.signal,
+      onStatus: (s) => {
+        status.hidden = s === 'live';
+        status.textContent = s === 'unreachable'
+          ? 'Harf can\'t be reached right now; the reply keeps going and will appear when it reconnects.'
+          : 'Reconnecting';
+      },
+      onRestart: () => {
+        reply.parts = [];
+        delete reply.error;
+        nodes.length = 0;
+        shown.length = 0;
+        dirty.clear();
+        body.replaceChildren(waiting());
+      },
+      onEvent: (event, data) => {
+        if (event === 'part') {
+          if (data.part) reply.parts[data.index] = data.part;
+          if (data.delta && reply.parts[data.index]) reply.parts[data.index].text = (reply.parts[data.index].text || '') + data.delta;
+          dirty.add(data.index);
+          schedule();
+        } else if (event === 'done') {
+          Object.assign(reply, data);
+          done();
+        } else if (event === 'title') {
+          chat.title = data.title;
+          upsertChat({ ...chat, updatedAt: new Date().toISOString() });
+          renderChats();
+          if (state.chat && state.chat.id === chat.id) renderTitle();
+        } else if (event === 'error') {
+          reply.error = data.error;
+        }
+      },
     });
   } catch (e) {
-    if (e.name !== 'AbortError') reply.error = e.message;
+    reply.error = e.message; // the server refused the request
   }
-  if (!finished) done();
+  done();
 
   function done() {
     if (state.streaming !== ctrl) return;
@@ -1154,41 +1167,17 @@ function uploadFile(chatID, file, progress) {
   });
 }
 
-// After a stop the server saves what arrived; fetch the saved copy so
-// every message has its id again.
-async function resync(id) {
-  for (let i = 0; i < 10; i++) {
-    try {
-      const c = await api('GET', `api/chats/${id}`);
-      const last = c.messages[c.messages.length - 1];
-      if (last && last.role === 'assistant') {
-        if (state.chat && state.chat.id === id) state.chat = c;
-        return;
-      }
-    } catch { return; }
-    await new Promise((r) => setTimeout(r, 150));
+// loadSaved shows the saved copy of a chat whose reply has ended. It throws
+// only when the server cannot be reached, so the caller tries again.
+async function loadSaved(id) {
+  let c;
+  try {
+    c = await api('GET', `api/chats/${id}`);
+  } catch (e) {
+    if (e instanceof TypeError) throw e;
+    return;
   }
-}
-
-async function readEvents(stream, onEvent) {
-  const reader = stream.pipeThrough(new TextDecoderStream()).getReader();
-  let buf = '';
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buf += value;
-    let i;
-    while ((i = buf.indexOf('\n\n')) >= 0) {
-      const block = buf.slice(0, i);
-      buf = buf.slice(i + 2);
-      let event = 'message', data = '';
-      for (const line of block.split('\n')) {
-        if (line.startsWith('event: ')) event = line.slice(7);
-        else if (line.startsWith('data: ')) data += line.slice(6);
-      }
-      if (data) onEvent(event, JSON.parse(data));
-    }
-  }
+  if (state.chat && state.chat.id === id) state.chat = c;
 }
 
 function setStreaming(on, busy) {
