@@ -3,7 +3,8 @@
 // tokens stand. theme.js applies the saved properties before first paint.
 
 export const FONTS = [
-  { id: 'google', label: 'Google Sans', stack: '' },
+  { id: 'google', label: 'Google Sans', stack: "'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif" },
+  { id: 'geist', label: 'Geist', stack: "'Geist', -apple-system, BlinkMacSystemFont, sans-serif" },
   { id: 'fira', label: 'Fira Sans', stack: "'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif" },
   { id: 'urbanist', label: 'Urbanist', stack: "'Urbanist', -apple-system, BlinkMacSystemFont, sans-serif" },
   { id: 'plex', label: 'IBM Plex Sans', stack: "'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif" },
@@ -43,10 +44,11 @@ function accentColor(accent) {
 // values are left out, so they fall back to the defaults.
 export function appearanceVars({ font, sideFont, size, accent } = {}) {
   const out = {};
-  const f = FONTS.find((x) => x.id === font);
-  if (f && f.stack) out['--font-sans'] = f.stack;
-  const sf = FONTS.find((x) => x.id === sideFont);
-  if (sf && sf.stack) out['--font-side'] = sf.stack;
+  // The defaults are the stylesheet's own fonts, so they set nothing.
+  const f = font !== DEFAULTS.font && FONTS.find((x) => x.id === font);
+  if (f) out['--font-sans'] = f.stack;
+  const sf = sideFont !== DEFAULTS.sideFont && FONTS.find((x) => x.id === sideFont);
+  if (sf) out['--font-side'] = sf.stack;
   const s = SIZES.find((x) => x.id === size);
   if (s && s.scale) out['--fs-scale'] = s.scale;
   const c = accentColor(accent);
@@ -54,7 +56,7 @@ export function appearanceVars({ font, sideFont, size, accent } = {}) {
   return out;
 }
 
-export const DEFAULTS = { font: 'google', sideFont: 'google', size: 'default', accent: 'default' };
+export const DEFAULTS = { font: 'google', sideFont: 'geist', size: 'default', accent: 'default' };
 
 // The custom properties appearanceVars can set; theme.js lists the same.
 export const VARS = ['--font-sans', '--font-side', '--fs-scale', '--accent-pick'];

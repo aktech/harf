@@ -4,6 +4,11 @@
 @font-face { font-family: 'Google Sans'; src: url(fonts/google-sans-latin-500-normal.woff2) format('woff2'); font-weight: 500; font-display: swap; }
 @font-face { font-family: 'Google Sans'; src: url(fonts/google-sans-latin-600-normal.woff2) format('woff2'); font-weight: 600; font-display: swap; }
 @font-face { font-family: 'Google Sans'; src: url(fonts/google-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+/* Geist 5.3.0, latin, from the @fontsource/geist npm package; licence in
+   fonts/geist-OFL.txt. The sidebar's font. */
+@font-face { font-family: 'Geist'; src: url(fonts/geist-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url(fonts/geist-latin-500-normal.woff2) format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Geist'; src: url(fonts/geist-latin-600-normal.woff2) format('woff2'); font-weight: 600; font-display: swap; }
 /* Fira Sans 5.3.0, latin, from the @fontsource/fira-sans npm package;
    licence in fonts/fira-sans-OFL.txt. */
 @font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
@@ -196,7 +201,7 @@ svg { flex: none; }
 .app-col { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 
 .side {
-  font-family: var(--font-side, 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif);
+  font-family: var(--font-side, 'Geist', -apple-system, BlinkMacSystemFont, sans-serif);
   min-height: 0; padding: 20px 14px 14px; border-right: 1px solid var(--border); background: var(--surface);
   display: flex; flex-direction: column; gap: 4px; overflow: hidden;
 }
@@ -489,7 +494,7 @@ svg { flex: none; }
 .chat.empty .thread { padding-bottom: 24px; }
 .chat.empty .composer-wrap { padding-bottom: 12vh; }
 .welcome { text-align: center; display: grid; justify-items: center; }
-.welcome h1 { font-family: var(--font-display); font-size: calc(var(--fs-xl) + 4px); line-height: 1.25; font-weight: 700; letter-spacing: -.01em; margin: 0 0 6px; text-wrap: balance; }
+.welcome h1 { font-family: var(--font-display); font-size: calc(var(--fs-xl) * 1.6); line-height: 1.25; font-weight: 700; letter-spacing: -.01em; margin: 0 0 6px; text-wrap: balance; }
 .welcome .lead { color: var(--text-3); font-size: var(--fs-sm); margin: 0; max-width: 460px; }
 /* Sample prompts between the greeting and the chat box. */
 .samples { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 22px 0 4px; max-width: var(--measure); }
@@ -1034,7 +1039,7 @@ svg { flex: none; }
   .msg.user .bubble, .edit-box, .attachments { max-width: 92%; }
   .att-thumb img { height: 104px; max-width: 180px; }
   .tray-item { max-width: 100%; }
-  .welcome h1 { font-size: var(--fs-lg); }
+  .welcome h1 { font-size: var(--fs-2xl); }
   .msg-actions { opacity: 1; }
   .tool-checks { grid-template-columns: minmax(0, 1fr); }
   .field-row { flex-wrap: wrap; }

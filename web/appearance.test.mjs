@@ -38,12 +38,16 @@ test('a sidebar font choice sets its own property and leaves the main font alone
   const v = appearanceVars({ font: 'google', sideFont: 'urbanist' });
   assert.match(v['--font-side'], /^'Urbanist',/);
   assert.equal(v['--font-sans'], undefined);
-  assert.deepEqual(appearanceVars({ sideFont: 'google' }), {});
+  // Geist is the sidebar's default, so choosing it sets nothing; Google
+  // Sans there is a choice like any other.
+  assert.deepEqual(appearanceVars({ sideFont: 'geist' }), {});
+  assert.match(appearanceVars({ sideFont: 'google' })['--font-side'], /^'Google Sans',/);
+  assert.match(appearanceVars({ font: 'geist' })['--font-sans'], /^'Geist',/);
   assert.deepEqual(appearanceVars({ sideFont: 'comic' }), {});
 });
 
 test('a saved font with no sidebar font keeps the sidebar in that font', () => {
   assert.equal(withDefaults({ font: 'fira' }).sideFont, 'fira');
   assert.equal(withDefaults({ font: 'fira', sideFont: 'plex' }).sideFont, 'plex');
-  assert.equal(withDefaults({}).sideFont, 'google');
+  assert.equal(withDefaults({}).sideFont, 'geist');
 });
