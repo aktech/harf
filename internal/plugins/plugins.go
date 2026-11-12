@@ -96,7 +96,9 @@ var Builtin = []Plugin{
 			"such as \"make me an agent that reviews Go code, uses Claude Sonnet, no bash\". " +
 			"Call list_agents first to see the exact model ids, tools and MCP servers, pick the ones that match what the user asked for, " +
 			"write clear instructions for the agent, then call create_agent (or update_agent for an existing one). " +
-			"Leave out what the user did not ask about, so the defaults apply. Harf shows the saved agent in your reply with a button to start a chat with it.",
+			"Leave out what the user did not ask about, so the defaults apply. Harf shows the saved agent in your reply with a button to start a chat with it. " +
+			"When asked to create an agent, create it and say in a few lines what you made; do not try it out or fetch data yourself unless the user asks. " +
+			"If the agent will need network access or a tool that is not available here, say so in one line instead of trying other ways.",
 		Web: []string{"agent-card"},
 	},
 }
