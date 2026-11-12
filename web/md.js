@@ -60,9 +60,10 @@ function makeParser() {
 
   rules.fence = rules.code_block = (tokens, i, _opts, env) => {
     const t = tokens[i];
-    const lang = t.info.trim().split(/\s+/)[0].toLowerCase();
+    const { lang, file } = fenceInfo(t.info);
     const code = t.content.replace(/\n$/, '');
-    return (env.ext.fence && env.ext.fence(lang, code, closed(t))) ?? `<pre data-lang="${esc(lang)}"><code>${highlight(code, lang)}</code></pre>\n`;
+    const named = file ? ` data-file="${esc(file)}"` : '';
+    return (env.ext.fence && env.ext.fence(lang, code, closed(t))) ?? `<pre data-lang="${esc(lang)}"${named}><code>${highlight(code, lang)}</code></pre>\n`;
   };
 
   rules.image = (tokens, i, opts, env, self) => {
@@ -97,6 +98,14 @@ function makeParser() {
   rules.table_open = () => '<div class="table"><table>\n';
   rules.table_close = () => '</table></div>\n';
   return md;
+}
+
+// fenceInfo reads a fence's info line: its language, then a file name
+// when one follows ("python chart.py" or 'js title="app.js"').
+function fenceInfo(info) {
+  const [lang = '', ...rest] = info.trim().split(/\s+/);
+  const m = rest.join(' ').match(/^(?:(?:title|file|filename)=)?"?([\w./-]*\.\w+)"?$/);
+  return { lang: lang.toLowerCase(), file: m ? m[1] : '' };
 }
 
 // closed reports whether a fence has its closing line. A fence's map covers

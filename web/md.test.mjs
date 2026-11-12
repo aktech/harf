@@ -177,3 +177,11 @@ test('while streaming, a half-written marker at the end is not shown', () => {
   // Inside an open code fence nothing changes.
   assert.equal(settle('```js\nconst a = 2 ** 3'), '```js\nconst a = 2 ** 3');
 });
+
+test('a fence names its file after the language when it gives one', () => {
+  const html = renderMarkdown('```python chart.py\nprint(1)\n```');
+  assert.match(html, /<pre data-lang="python" data-file="chart.py">/);
+  assert.match(renderMarkdown('```js title="src/app.js"\nx\n```'), /data-lang="js" data-file="src\/app.js"/);
+  assert.doesNotMatch(renderMarkdown('```python\nx\n```'), /data-file/);
+  assert.doesNotMatch(renderMarkdown('```python {linenos}\nx\n```'), /data-file/);
+});
