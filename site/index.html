@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harf: a self-hosted chat interface for the Pi coding agent</title>
+<meta name="description" content="Harf is a self-hosted chat interface for the Pi coding agent. One Go binary: chat in the browser while Pi reads files, runs commands and draws charts in a folder you choose.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#F3EFE8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Harf">
+<meta property="og:description" content="A self-hosted chat interface for the Pi coding agent.">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+@font-face { font-family: Urbanist; src: url(fonts/Urbanist-400.ttf) format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Urbanist; src: url(fonts/Urbanist-500.ttf) format("truetype"); font-weight: 500; font-display: swap; }
+@font-face { font-family: Urbanist; src: url(fonts/Urbanist-700.ttf) format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Fira Code"; src: url(fonts/fira-code-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Fira Code"; src: url(fonts/fira-code-latin-500-normal.woff2) format("woff2"); font-weight: 500; font-display: swap; }
+
+:root {
+  --paper: #F3EFE8;
+  --ink: #141414;
+  --muted: #5E5A53;
+  --faint: #8C877E;
+  --rule: #DCD5C9;
+  --sheet: #FBF9F5;
+  --well: #E9E4DB;
+  --side: #EDE8E0;
+  --sans: Urbanist, ui-sans-serif, system-ui, sans-serif;
+  --mono: "Fira Code", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141414;
+    --ink: #F3EFE8;
+    --muted: #A39E95;
+    --faint: #77736C;
+    --rule: #2E2C29;
+    --sheet: #1A1918;
+    --well: #252421;
+    --side: #1E1D1B;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
+code { font-family: var(--mono); font-size: .86em; background: var(--well); padding: .1em .35em; border-radius: 5px; }
+button { font: inherit; color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+/* ---------- top and hero ---------- */
+.top { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+.top .mark { display: block; height: 52px; margin-left: -12px; }
+.top .mark img { height: 100%; width: auto; display: block; }
+.top nav { display: flex; gap: 28px; font-weight: 500; font-size: 16px; }
+.top nav a { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; }
+.top nav svg { width: 18px; height: 18px; flex: none; }
+.top nav svg.line { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.top nav a:hover { text-decoration: underline; }
+.logo-dark { display: none !important; }
+@media (prefers-color-scheme: dark) { .logo-light { display: none !important; } .logo-dark { display: block !important; } }
+
+.hero { text-align: center; padding: 40px 0 44px; }
+h1 { margin: 0 auto; max-width: 15em; font-weight: 700; letter-spacing: -0.03em; line-height: 1.04; font-size: clamp(36px, 4.6vw, 56px); }
+.pi { height: .72em; width: auto; margin: 0 .04em; vertical-align: -.02em; }
+.lede { margin: 18px auto 0; max-width: 36em; font-size: 19px; color: var(--muted); }
+.cta { margin-top: 26px; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 11px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1px solid var(--ink); }
+.btn.solid { background: var(--ink); color: var(--paper); }
+.btn.solid:hover { opacity: .88; }
+.btn:not(.solid):hover { background: var(--well); }
+.btn svg { width: 18px; height: 18px; }
+.try { margin: 14px 0 0; font-size: 15px; color: var(--faint); }
+
+/* ---------- the demo: Harf itself, talking to a pretend server in the browser ---------- */
+.demo-frame { height: 720px; border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; background: var(--paper);
+  box-shadow: 0 1px 0 var(--rule), 0 40px 80px -48px rgb(20 20 20 / .45); }
+.demo-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.demo-wrap { padding-bottom: 96px; }
+
+
+
+
+
+/* ---------- sections ---------- */
+section.part { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr); gap: 48px; padding: 56px 0 72px; border-top: 1px solid var(--rule); }
+h2 { margin: 0; font-size: 34px; line-height: 1.1; letter-spacing: -0.025em; font-weight: 700; }
+.feats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 48px; margin: 0; }
+.feats div { min-width: 0; }
+.feats dt { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; margin-bottom: 6px; }
+.feats dt svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.feats dd { margin: 0; padding-left: 32px; color: var(--muted); font-size: 16.5px; }
+.runit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); gap: 56px; align-items: center; padding: 72px 0 96px; border-top: 1px solid var(--rule); }
+.run-copy > p { margin: 14px 0 0; color: var(--muted); font-size: 18px; }
+.facts { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 18px; }
+.facts li { display: flex; gap: 14px; align-items: flex-start; font-size: 16.5px; color: var(--muted); }
+.facts b { color: var(--ink); font-weight: 600; }
+.facts svg { width: 22px; height: 22px; flex: none; margin-top: 1px; fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.term { --t-bg: #141414; --t-bar: #1E1D1B; --t-line: #2E2C29; --t-text: #F3EFE8; --t-dim: #8C877E;
+  background: var(--t-bg); color: var(--t-text); border-radius: 16px; overflow: hidden; border: 1px solid var(--t-line);
+  box-shadow: 0 40px 80px -48px rgb(20 20 20 / .6); min-width: 0; }
+.term-bar { display: flex; align-items: center; justify-content: space-between; background: var(--t-bar); border-bottom: 1px solid var(--t-line); padding: 0 8px 0 12px; }
+.term-tabs { display: flex; gap: 2px; }
+.term-tabs button { border: 0; background: none; color: var(--t-dim); padding: 13px 12px 11px; border-bottom: 2px solid transparent; cursor: pointer; font: 500 14px var(--sans); }
+.term-tabs button:hover { color: var(--t-text); }
+.term-tabs button[aria-selected="true"] { color: var(--t-text); border-bottom-color: var(--t-text); }
+.term .copy { position: static; color: var(--t-text); }
+.term-body { margin: 0; padding: 20px 22px 24px; font: 400 14px/1.75 var(--mono); white-space: pre; overflow-x: auto; }
+.term-body[hidden] { display: none; }
+.term .c { color: var(--t-dim); }
+.term .pr { color: var(--t-dim); user-select: none; }
+.term .k { color: #F1BE58; }
+.term .f { color: #4D9ABF; }
+.term .a { color: #A8C98A; }
+.term .o { display: inline-block; margin-top: 8px; color: var(--t-dim); }
+.term .ok { color: var(--t-text); font-family: var(--sans); font-weight: 600; font-size: 15px; }
+.term .ok::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #A8C98A; margin: 0 10px 1px 0; }
+.cmd { position: relative; margin-top: 12px; background: var(--ink); color: var(--paper); border-radius: 12px; font: 400 14px/1.5 var(--mono); padding: 14px 52px 14px 16px; overflow-x: auto; white-space: pre; }
+.cmd .p { opacity: .5; user-select: none; }
+.copy { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: inherit; opacity: .65; cursor: pointer; }
+.copy:hover { opacity: 1; background: color-mix(in srgb, currentColor 12%, transparent); }
+.copy svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.copy .done { display: none; }
+.copy.copied .idle { display: none; }
+.copy.copied .done { display: block; }
+footer { border-top: 1px solid var(--rule); padding: 36px 0 56px; display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; font-size: 15px; color: var(--muted); }
+footer nav { display: flex; gap: 24px; }
+
+@media (max-width: 900px) {
+  section.part, .runit { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+}
+@media (max-width: 600px) {
+  .wrap { padding: 0 16px; }
+  .top .mark { height: 40px; margin-left: -8px; }
+  .top nav { gap: 18px; }
+  .hero { padding: 24px 0 32px; }
+  .lede { font-size: 17px; }
+  .feats { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="mark" href="./" aria-label="Harf home">
+      <img class="logo-light" src="img/harf-wordmark-black.svg" alt="Harf">
+      <img class="logo-dark" src="img/harf-wordmark-paper.svg" alt="Harf">
+    </a>
+    <nav aria-label="Main">
+      <a href="#run"><svg viewBox="0 0 24 24" class="line" aria-hidden="true"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>Run it</a>
+      <a href="https://github.com/aktech/harf/tree/main/docs"><svg viewBox="0 0 24 24" class="line" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>Docs</a>
+      <a href="https://github.com/aktech/harf"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.9.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.8-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>A self-hosted chat interface for the <img class="pi" src="img/pi-mark.svg" alt="Pi"> coding agent.</h1>
+      <p class="lede">One Go binary. Chat in the browser while <a href="https://pi.dev">Pi</a> reads files, runs commands and draws charts in a workspace folder, with any model Pi supports.</p>
+      <div class="cta">
+        <a class="btn solid" href="#run">Run it yourself</a>
+        <a class="btn" href="https://github.com/aktech/harf"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.9.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.8-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>View on GitHub</a>
+      </div>
+      <p class="try">The demo below runs in your browser with scripted replies.</p>
+    </div>
+
+    <div class="demo-wrap">
+      <div class="demo-frame">
+        <iframe src="demo/index.html" title="A working copy of Harf with scripted replies" loading="eager"></iframe>
+      </div>
+    </div>
+
+    <section class="part" aria-labelledby="what">
+      <h2 id="what">What a chat can do</h2>
+      <dl class="feats">
+        <div><dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>Use any model Pi can use</dt><dd>Pick a model for each chat. Replies stream in with Markdown, maths and highlighted code.</dd></div>
+        <div><dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19h8"/><path d="m4 17 6-6-6-6"/></svg>See every step</dt><dd>Each file Pi reads or writes and each command it runs shows in the reply, with its output.</dd></div>
+        <div><dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>Save agents</dt><dd>Keep instructions, a model and the tools it may use as an agent. Or describe one in a chat and Pi builds it.</dd></div>
+        <div><dt><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>Connect tools over MCP</dt><dd>Add an MCP server in Settings, by command or URL, and Pi can use its tools in any chat.</dd></div>
+        <div><dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Charts, pages and images</dt><dd>Attach files up to 100 MB. Pi can draw charts, build HTML pages that run sandboxed, and make images.</dd></div>
+        <div><dt><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/></svg>Keep your chats</dt><dd>Stop, edit and resend, search, pin and rename. Export any chat as Markdown.</dd></div>
+      </dl>
+    </section>
+
+    <section class="runit" id="run" aria-labelledby="runTitle">
+      <div class="run-copy">
+        <h2 id="runTitle">Run it</h2>
+        <p>One command with Docker, or three from source. Then open <code>localhost:8080</code>.</p>
+        <ul class="facts">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/></svg><span><b>Pi is in the image.</b> Nothing else to install.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg><span><b>linux/amd64 and linux/arm64.</b> A laptop, a server or a Raspberry Pi.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="22" x2="2" y1="12" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" x2="6.01" y1="16" y2="16"/><line x1="10" x2="10.01" y1="16" y2="16"/></svg><span><b>Your chats stay with you.</b> Chats, settings and the workspace live in the <code>harf</code> volume.</span></li>
+        </ul>
+      </div>
+      <div class="term">
+        <div class="term-bar">
+          <div class="term-tabs" role="tablist" aria-label="How to run Harf">
+            <button type="button" role="tab" id="tabDocker" aria-selected="true" aria-controls="paneDocker">Docker</button>
+            <button type="button" role="tab" id="tabSource" aria-selected="false" aria-controls="paneSource" tabindex="-1">From source</button>
+          </div>
+          <button class="copy" type="button" aria-label="Copy the commands" id="termCopy"><svg class="idle" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><svg class="done" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>
+        </div>
+        <div class="term-body" role="tabpanel" id="paneDocker" aria-labelledby="tabDocker" data-copy="docker run -p 8080:8080 --env-file keys.env -v harf:/home/user ghcr.io/aktech/harf:main"><span class="c"># keys.env: your model provider keys, one NAME=value per line</span>
+<span class="pr">$</span> <span class="k">docker</span> run <span class="f">-p</span> <span class="a">8080:8080</span> <span class="f">--env-file</span> <span class="a">keys.env</span> \
+    <span class="f">-v</span> <span class="a">harf:/home/user</span> <span class="a">ghcr.io/aktech/harf:main</span>
+<span class="o">INFO harf listening url=http://0.0.0.0:8080 pi=/opt/pi/pi</span>
+<span class="ok">Open http://localhost:8080</span></div>
+        <div class="term-body" role="tabpanel" id="paneSource" aria-labelledby="tabSource" hidden data-copy="git clone https://github.com/aktech/harf &amp;&amp; cd harf&#10;make build&#10;./bin/harf"><span class="c"># needs Go 1.26 and Pi 1.4.0, signed in with: pi, then /login</span>
+<span class="pr">$</span> <span class="k">git</span> clone <span class="a">https://github.com/aktech/harf</span> <span class="f">&amp;&amp;</span> <span class="k">cd</span> <span class="a">harf</span>
+<span class="pr">$</span> <span class="k">make</span> build
+<span class="pr">$</span> <span class="k">./bin/harf</span>
+<span class="o">INFO harf listening url=http://127.0.0.1:8080</span>
+<span class="ok">Open http://localhost:8080</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Harf is open source under Apache 2.0. Built on <a href="https://pi.dev">Pi</a>.</span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/aktech/harf">GitHub</a>
+      <a href="https://github.com/aktech/harf/tree/main/docs">Docs</a>
+      <a href="https://github.com/aktech/harf/pkgs/container/harf">Container image</a>
+    </nav>
+  </footer>
+</div>
+
+<script type="module">
+document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(b.dataset.copy); } catch { return; }
+  b.classList.add('copied'); b.setAttribute('aria-label', 'Copied');
+  setTimeout(() => { b.classList.remove('copied'); b.setAttribute('aria-label', 'Copy the command'); }, 1600);
+}));
+
+// ---------- run it: two ways, one copy button ----------
+{
+  const tabs = [...document.querySelectorAll('.term-tabs [role=tab]')];
+  const pick = (t) => tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; document.getElementById(x.getAttribute('aria-controls')).hidden = !on; });
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => pick(t));
+    t.addEventListener('keydown', (ev) => {
+      const step = { ArrowRight: 1, ArrowLeft: tabs.length - 1 }[ev['key']];
+      if (step) { const n = tabs[(i + step) % tabs.length]; pick(n); n.focus(); }
+    });
+  });
+  const tc = document.getElementById('termCopy');
+  // The copy handler below reads data-copy; point it at the open tab first.
+  tc.addEventListener('click', () => { tc.dataset.copy = document.querySelector('.term-body:not([hidden])').dataset.copy; }, true);
+}
+
+</script>
+</body>
+</html>

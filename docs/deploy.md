@@ -7,10 +7,10 @@ The image holds Harf, Pi 1.4.0, bash, git, ripgrep, fd, curl, python3 and jq on 
 - `HOME=/home/user`, so Pi keeps its settings in `/home/user/.pi/agent`.
 - `HARF_DATA=/home/user/.harf` and `HARF_WORKSPACE=/home/user/workspace`.
 
-Run it with port `8080` published, a provider key in the environment and a volume at `/home/user`, so chats, Pi's settings and the workspace survive restarts:
+Run it with port `8080` published, your provider keys in `keys.env` (`NAME=value` lines, see [configuration](configuration.md)) and a volume at `/home/user`, so chats, Pi's settings and the workspace survive restarts:
 
 ```sh
-docker run -p 8080:8080 -e ANTHROPIC_API_KEY -v harf:/home/user ghcr.io/aktech/harf:main
+docker run -p 8080:8080 --env-file keys.env -v harf:/home/user ghcr.io/aktech/harf:main
 ```
 
 Read [security](security.md) before exposing it: Harf has no sign-in of its own.

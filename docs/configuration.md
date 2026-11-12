@@ -8,8 +8,8 @@ Harf reads these environment variables. The first five also have a command-line 
 | `HARF_DATA` | Where chats, agents and Pi sessions are stored (default `~/.harf`) |
 | `HARF_WORKSPACE` | Folder Pi's tools work in (default `<HARF_DATA>/workspace`) |
 | `HARF_PI` | The Pi executable (default `pi` on `PATH`) |
-| `HARF_DEFAULT_MODEL` | Model for new chats, as `provider/id`, such as `anthropic/claude-sonnet-5-5` |
-| `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `MISTRAL_API_KEY`, `GROQ_API_KEY`, `XAI_API_KEY`, `DEEPSEEK_API_KEY` | Provider keys, read by Pi. The full list is in [Pi's provider docs](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/providers.md) |
+| `HARF_DEFAULT_MODEL` | Model for new chats, as `provider/id`, such as `openrouter/qwen/qwen3-coder` |
+| `OPENAI_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `MISTRAL_API_KEY`, `GROQ_API_KEY`, `XAI_API_KEY`, `DEEPSEEK_API_KEY` | Provider keys, read by Pi. The full list is in [Pi's provider docs](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/providers.md) |
 | `PI_CODING_AGENT_DIR` | Pi's settings and saved logins (default `~/.pi/agent`) |
 | `PI_OFFLINE` | `1` stops Pi's automatic network calls, such as model list refreshes and tool downloads (set in the image) |
 

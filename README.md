@@ -43,13 +43,13 @@ Install Pi 1.4.0 and sign in (run `pi`, then `/login`) or set a provider key, th
 
 ```sh
 make build
-ANTHROPIC_API_KEY=... ./bin/harf    # http://127.0.0.1:8080
+./bin/harf    # http://127.0.0.1:8080, with your model provider's key in the environment
 ```
 
-Or with Docker:
+Or with Docker, with your provider keys in `keys.env` as `NAME=value` lines ([which names](docs/configuration.md)):
 
 ```sh
-docker run -p 8080:8080 -e ANTHROPIC_API_KEY -v harf:/home/user ghcr.io/aktech/harf:main
+docker run -p 8080:8080 --env-file keys.env -v harf:/home/user ghcr.io/aktech/harf:main
 ```
 
 > [!WARNING]
