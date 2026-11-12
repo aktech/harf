@@ -5,7 +5,7 @@ import { stepTime, workSummary, plainPeek } from './work.js';
 test('a step takes tenths of a second, then minutes and seconds', () => {
   assert.equal(stepTime(400), '0.4s');
   assert.equal(stepTime(11800), '11.8s');
-  assert.equal(stepTime(30), '0.0s');
+  assert.equal(stepTime(30), '<0.1s');
   assert.equal(stepTime(65000), '1m 5s');
   assert.equal(stepTime(0), '');
 });
@@ -17,6 +17,7 @@ test('finished steps say how long they worked and how many there were', () => {
 
 test('one step is a step, and work under a second still reads as time', () => {
   assert.equal(workSummary([{ status: 'done', ms: 300 }]).text, 'Worked for 0.3s · 1 step');
+  assert.equal(workSummary([{ status: 'done', ms: 10 }, { status: 'done', ms: 20 }]).text, 'Worked for <0.1s · 2 steps');
 });
 
 test('while a step runs the card says it is working', () => {

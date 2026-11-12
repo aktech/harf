@@ -5,7 +5,8 @@ import { statsSummary, statsDetail } from './stats.js';
 import { revealNext, shownText } from './reveal.js';
 import { groupModels } from './models.js';
 import { makerOf, providerName, providerLogo } from './makers.js';
-import { beam } from './avatar.js';
+import { stepTime, workSummary, plainPeek } from './work.js';
+import { agentTags, agentActivity, editedLabel } from './agents.js';
 import { createPalette } from './palette.js';
 import { FONTS, SIZES, ACCENTS, loadAppearance, applyAppearance } from './appearance.js';
 import { parsePairs, formatPairs, mcpTool, savedAgent } from './mcp.js';
@@ -37,50 +38,49 @@ const svg = (paths) => {
   s.innerHTML = paths; // constant markup from this file only
   return s;
 };
+// Every icon is from Lucide 1.63.0 (ISC licence, lucide-static on npm);
+// web/icons/SOURCE.txt lists them.
 const ICON = {
-  copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/>',
-  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
-  edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
-  redo: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M20 4.5v4h-4"/>',
-  dots: '<circle cx="5.5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18.5" cy="12" r="1.2"/>',
-  chevron: '<path d="m9 6 6 6-6 6"/>',
-  terminal: '<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="m7 9.5 3 2.5-3 2.5M12.5 15H17"/>',
-  file: '<path d="M14 3.5H7.5A2.5 2.5 0 0 0 5 6v12a2.5 2.5 0 0 0 2.5 2.5h9A2.5 2.5 0 0 0 19 18V8.5z"/><path d="M14 3.5v5h5"/>',
-  pencil: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/>',
-  tool: '<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3z"/><path d="M14.5 6.5 17 4"/>',
-  spark: '<path d="M12 3.5c.6 4.4 2.6 6.9 7.5 8.5-4.9 1.6-6.9 4.1-7.5 8.5-.6-4.4-2.6-6.9-7.5-8.5 4.9-1.6 6.9-4.1 7.5-8.5z"/>',
-  x: '<path d="M7 7l10 10M17 7 7 17"/>',
-  alert: '<path d="M12 7.5v5.5M12 16.5v.01"/>',
-  plus: '<path d="M12 5v14M5 12h14"/>',
-  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/>',
-  moon: '<path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>',
-  monitor: '<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/>',
-  image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m20.5 16-4.5-4.5-8.5 8"/>',
-  panelClose: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M16 15l-3-3 3-3"/>',
-  panelOpen: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M14 9l3 3-3 3"/>',
-  panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/>',
-  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  edit: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+  redo: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
+  dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  chevDown: '<path d="m6 9 6 6 6-6"/>',
+  chevUp: '<path d="m18 15-6-6-6 6"/>',
+  terminal: '<path d="M12 19h8"/><path d="m4 17 6-6-6-6"/>',
+  file: '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/>',
+  filePlus: '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M9 15h6"/><path d="M12 18v-6"/>',
+  tool: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
+  plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  moon: '<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>',
+  monitor: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+  image: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  panel: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+  panelOpen: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/>',
+  panelClose: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/>',
+  menu: '<path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/>',
   chat: '<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/>',
-  newChat: '<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.85z"/>',
-  settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
-  plug: '<path d="M9 3.5v3.5M15 3.5v3.5"/><path d="M6.5 7h11v3a5.5 5.5 0 0 1-11 0z"/><path d="M12 15.5v5"/>',
-  // chart-column, lightbulb, sparkle and wand-sparkles from Lucide 1.63.0 (ISC
+  newChat: '<path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
+  settings: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
+  plug: '<path d="M12 22v-5"/><path d="M15 8V2"/><path d="M17 8a1 1 0 0 1 1 1v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"/><path d="M9 8V2"/>',
   sparkle: '<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>',
-  // licence, lucide-static on npm)
   chart: '<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
   idea: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
   agent: '<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>',
-  info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5M12 8h.01"/>',
-  swatch: '<path d="M12 21a9 9 0 1 1 9-9c0 2.2-1.8 2.7-3.1 2.7H15.6a1.8 1.8 0 0 0-1.35 3A1.8 1.8 0 0 1 12.9 21z"/><circle cx="7.5" cy="11" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="11" r="1"/>',
-  chevDown: '<path d="m6 9 6 6 6-6"/>',
-  server: '<rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01M8 16.5h.01"/>',
-  cube: '<path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4z"/><path d="m4 7.4 8 4.6 8-4.6M12 12v9.2"/>',
-  // pencil-line, pin, pin-off, download, trash-2, x, check, plug-zap and
-  // arrow-up from Lucide 1.63.0 (ISC licence, lucide-static on npm)
+  bot: '<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  swatch: '<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>',
+  server: '<rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/>',
+  cube: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
   pencilLine: '<path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
   pin: '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>',
   pinOff: '<path d="M12 17v5"/><path d="M15 9.34V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H7.89"/><path d="m2 2 20 20"/><path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h11"/>',
   download: '<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
   trash: '<path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   cancel: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   save: '<path d="M20 6 9 17l-5-5"/>',
@@ -191,17 +191,19 @@ function renderAgents() {
   list.replaceChildren();
   if (!state.agents.length) {
     list.append(el('li', { class: 'agent-empty' }, 'Give a model a role and instructions, then chat with it.'));
+    renderAgentsPage();
     return;
   }
   const active = currentAgent();
   for (const a of state.agents) {
     const li = el('li', { class: active && active.id === a.id ? 'active' : '' },
       el('button', { class: 'agent-go', title: a.description || a.name, onclick: () => startChat(a) },
-        el('span', { class: 'name' }, a.name)),
+        el('span', { class: 'agent-dot', 'aria-hidden': 'true' }), el('span', { class: 'name' }, a.name)),
       el('button', { class: 'icon-btn agent-edit', onclick: () => openAgent(a), 'aria-label': `Edit ${a.name}`, title: `Edit ${a.name}` }, svg(ICON.edit)));
     li.style.setProperty('--agent', agentColor(a));
     list.append(li);
   }
+  renderAgentsPage();
 }
 
 function dayGroup(iso) {
@@ -221,6 +223,7 @@ function renderChats() {
   const chats = state.chats;
   if (!chats.length) {
     nav.append(el('div', { class: 'list-empty' }, 'Your chats will be listed here.'));
+    renderAgentsPage();
     return;
   }
   const groups = new Map();
@@ -234,6 +237,7 @@ function renderChats() {
     for (const c of items) sec.append(chatRow(c));
     nav.append(sec);
   }
+  renderAgentsPage();
 }
 
 function chatRow(c) {
@@ -244,21 +248,29 @@ function chatRow(c) {
   const more = el('button', { class: 'icon-btn row-menu', 'aria-label': 'Chat options', 'aria-haspopup': 'menu' }, svg(ICON.dots));
   more.addEventListener('click', (e) => {
     e.preventDefault();
-    showMenu(more, [
-      ['Rename', ICON.pencilLine, () => renameRow(row, c)],
-      [c.pinned ? 'Unpin' : 'Pin', c.pinned ? ICON.pinOff : ICON.pin, () => patchChat(c.id, { pinned: !c.pinned })],
-      ['Export as Markdown', ICON.download, () => exportChat(c.id)],
-      null,
-      ['Delete', ICON.trash, () => confirmDelete(more, c), 'danger'],
-    ]);
+    showMenu(more, chatMenu(c, more, () => renameIn(row, c)));
   });
   row.append(more);
   return row;
 }
 
-function renameRow(row, c) {
+// chatMenu is what can be done to a chat, from its sidebar row or the
+// title at the top; rename edits the title where the menu was opened.
+function chatMenu(c, anchor, rename) {
+  return [
+    ['Rename', ICON.pencilLine, rename],
+    [c.pinned ? 'Unpin' : 'Pin', c.pinned ? ICON.pinOff : ICON.pin, () => patchChat(c.id, { pinned: !c.pinned })],
+    ['Export as Markdown', ICON.download, () => exportChat(c.id)],
+    null,
+    ['Delete', ICON.trash, () => confirmDelete(anchor, c), 'danger'],
+  ];
+}
+
+// renameIn swaps box's content for a field holding the chat's title; Enter
+// or leaving it saves, Escape puts things back.
+function renameIn(box, c) {
   const input = el('input', { class: 'rename', value: c.title || '', 'aria-label': 'Chat title' });
-  row.replaceChildren(input);
+  box.replaceChildren(input);
   input.focus();
   input.select();
   let done = false;
@@ -267,7 +279,7 @@ function renameRow(row, c) {
     done = true;
     const t = input.value.trim();
     if (save && t && t !== c.title) await patchChat(c.id, { title: t });
-    else renderChats();
+    else { renderChats(); renderTitle(); }
   };
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') finish(true);
@@ -315,6 +327,16 @@ function showMenu(anchor, items) {
     const [label, icon, fn, cls] = it;
     m.append(el('button', { role: 'menuitem', class: cls || '', onclick: () => { closeMenu(); fn(); } }, svg(icon), label));
   }
+  // Arrow keys move along the items; Escape closes and returns to the key
+  // that opened the menu; Tab leaves it.
+  m.addEventListener('keydown', (e) => {
+    const items = [...m.querySelectorAll('button')];
+    const i = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeMenu(); if (anchor.isConnected) anchor.focus(); }
+    else if (e.key === 'Tab') closeMenu();
+  });
   popUp(m, anchor);
   m.querySelector('button').focus();
 }
@@ -323,7 +345,8 @@ function showMenu(anchor, items) {
 function popUp(m, anchor) {
   document.body.append(m);
   const r = anchor.getBoundingClientRect();
-  const left = Math.min(r.left, innerWidth - m.offsetWidth - 12);
+  // Left-aligned with its anchor, or right-aligned when that runs off screen.
+  const left = r.left + m.offsetWidth > innerWidth - 12 ? Math.min(r.right, innerWidth - 12) - m.offsetWidth : r.left;
   const top = r.bottom + 4 + m.offsetHeight > innerHeight - 12 ? r.top - m.offsetHeight - 4 : r.bottom + 4;
   m.style.left = Math.max(12, left) + 'px';
   m.style.top = top + 'px';
@@ -341,13 +364,40 @@ document.addEventListener('pointerdown', (e) => { if (menuEl && !menuEl.m.contai
 $('scroller').addEventListener('scroll', () => { if (menuEl && menuEl.m.classList.contains('stats-pop')) closeMenu(); }, { passive: true });
 
 // ---------- top bar ----------
+// renderTitle shows the open chat's title at the top, a key that opens the
+// chat's menu; a new chat shows its agent, if it has one, or nothing.
 function renderTitle() {
-  const t = $('chatTitle');
-  t.replaceChildren();
+  const t = $('topTitle');
+  const c = state.chat;
   const agent = currentAgent();
-  t.append(el('span', {}, state.chat ? state.chat.title || 'New chat' : agent ? agent.name : ''));
-  document.title = state.chat && state.chat.title ? `${state.chat.title} · Harf` : 'Harf';
+  $('shareBtn').disabled = !c;
+  document.title = c && c.title ? `${c.title} · Harf` : 'Harf';
+  if (!$('agentsPage').hidden || !$('settingsPage').hidden) { t.replaceChildren(); return; }
+  if (!c) { t.replaceChildren(agent ? el('span', { class: 'top-name' }, agent.name) : ''); return; }
+  const b = el('button', { type: 'button', class: 'title-btn', 'aria-haspopup': 'menu', 'aria-expanded': 'false', title: 'Chat options' },
+    el('span', { class: 'top-name' }, c.title || 'New chat'), svg(ICON.chevDown));
+  b.addEventListener('click', () => {
+    if (menuEl && menuEl.anchor === b) { closeMenu(); return; }
+    const chat = state.chats.find((x) => x.id === c.id) || c;
+    showMenu(b, chatMenu(chat, b, () => renameIn(t, chat)));
+  });
+  b.addEventListener('pointerdown', (e) => e.stopPropagation());
+  t.replaceChildren(b);
 }
+
+// The Share key: there is no public sharing, so it copies the chat's
+// address for someone with access to this Harf, or saves it as Markdown.
+$('shareBtn').addEventListener('pointerdown', (e) => e.stopPropagation());
+$('shareBtn').addEventListener('click', () => {
+  const b = $('shareBtn');
+  if (menuEl && menuEl.anchor === b) { closeMenu(); return; }
+  if (!state.chat) return;
+  const id = state.chat.id;
+  showMenu(b, [
+    ['Copy link', ICON.link, async () => { await copy(location.origin + location.pathname + location.search + '#c=' + id); toast('Link copied'); }],
+    ['Export as Markdown', ICON.download, () => exportChat(id)],
+  ]);
+});
 
 function renderModels() {
   const cur = currentModel();
@@ -498,7 +548,6 @@ function renderThread() {
   const thread = $('thread');
   thread.replaceChildren();
   applyHue();
-  $('newChat').classList.toggle('active', !state.chat && !state.draftAgent && $('settingsPage').hidden);
   renderTitle();
   renderModels();
   renderComposerAgent();
@@ -564,19 +613,20 @@ function messageView(m, last) {
   const body = el('div', { class: 'body' });
   const parts = m.parts && m.parts.length ? m.parts : m.content ? [{ type: 'text', text: m.content }] : [];
   parts.forEach((p) => placePart(body, partView(p)));
-  const agent = currentAgent();
+  refreshWork(body);
+  const main = el('div', { class: 'msg-main' }, body);
   const wrap = el('div', { class: 'msg assistant' + (last ? ' last' : ''), 'data-id': m.id || '' },
-    el('div', { class: 'msg-who' }, agent ? `${agent.name} · ${modelName(m.model || '')}` : modelName(m.model || '')), body);
+    el('span', { class: 'msg-mark', 'aria-hidden': 'true' }, svg(ICON.sparkle)), main);
   if (m.error) {
     const stopped = m.error === 'Stopped';
-    wrap.append(el('div', { class: 'msg-error' + (stopped ? ' stopped' : '') },
+    main.append(el('div', { class: 'msg-error' + (stopped ? ' stopped' : '') },
       el('span', {}, stopped ? 'Stopped before the reply finished.' : m.error),
       m.id && !state.streaming ? el('button', { class: 'btn sm', onclick: () => regenerate(m) }, svg(ICON.redo), stopped ? 'Regenerate' : 'Try again') : null));
   }
-  const stats = m.id && statsView(m.usage);
-  if (stats) wrap.append(stats);
+  const stats = m.id && statsView(m.usage, m.model);
+  if (stats) main.append(stats);
   if (m.id && m.content) {
-    wrap.append(el('div', { class: 'msg-actions' },
+    main.append(el('div', { class: 'msg-actions' },
       actionBtn('Copy reply', ICON.copy, (b) => copy(m.content, b)),
       actionBtn('Regenerate reply', ICON.redo, () => regenerate(m))));
   }
@@ -585,15 +635,16 @@ function messageView(m, last) {
 
 // statsView is a reply's token and timing stats: a short line that opens
 // the full list in a popover. Nothing when the model reported no usage.
-function statsView(usage) {
+function statsView(usage, model) {
   const line = statsSummary(usage);
   if (!line.length) return null;
+  if (model) line.unshift(modelName(model));
   const b = el('button', { type: 'button', class: 'msg-stats', 'aria-haspopup': 'dialog', title: 'Reply stats' }, ...line.map((s) => el('span', {}, s)));
   b.addEventListener('pointerdown', (e) => e.stopPropagation()); // its click toggles
   b.addEventListener('click', () => {
     if (menuEl && menuEl.anchor === b) { closeMenu(); return; }
     closeMenu();
-    const rows = statsDetail(usage);
+    const rows = [...(model ? [['Model', modelName(model)]] : []), ...statsDetail(usage)];
     const pop = el('div', { class: 'menu stats-pop', role: 'dialog', 'aria-label': 'Reply stats', tabindex: '-1' },
       el('dl', {}, ...rows.flatMap(([k, v]) => [el('dt', {}, k), el('dd', {}, v)])));
     popUp(pop, b);
@@ -638,16 +689,13 @@ function partView(p, open, streaming) {
   }
   if (p.type === 'thinking') {
     const text = (p.text || '').trim();
-    return step('think', open, svg(ICON.spark),
-      [el('b', {}, 'Thinking'), text ? el('span', { class: 'peek' }, firstLine(text)) : null], null,
+    return step('think', open, svg(ICON.idea), 'Thought', text ? el('span', { class: 'peek' }, plainPeek(text)) : null, 0,
       () => [el('div', { class: 'think-text' }, text || 'No thinking shown.')]);
   }
   const t = p.tool || {};
   const { label, detail } = describeTool(t);
   const status = t.status === 'error' ? 'error' : t.status === 'done' ? 'done' : 'running';
-  const li = step(status, open, svg(toolIcon(t.name)),
-    [el('b', {}, label), detail ? el('span', { class: 'arg' }, detail) : null],
-    t.ms ? fmtMs(t.ms) : status === 'running' ? 'running' : '',
+  const li = step(status, open, svg(toolIcon(t)), label, detail ? el('span', { class: 'arg' }, detail) : null, t.ms || 0,
     () => {
       const out = [];
       const args = toolArgs(t);
@@ -658,7 +706,7 @@ function partView(p, open, streaming) {
     });
   // An image the step wrote is shown under it, without opening the step.
   const img = state.web.has('workspace-images') && toolImage(t, state.workspace);
-  if (img) li.append(el('a', { class: 'step-media', href: img, target: '_blank', rel: 'noopener' }, el('img', { src: img, alt: `Image written to ${detail}`, loading: 'lazy' })));
+  if (img) li.append(mediaCard('Image', detail.split('/').pop(), el('a', { href: img, target: '_blank', rel: 'noopener' }, el('img', { src: img, alt: `Image written to ${detail}`, loading: 'lazy' }))));
   const made = state.web.has('agent-card') && savedAgent(t);
   if (made) li.append(agentCard(made));
   return li;
@@ -689,13 +737,13 @@ function mdHooks() {
   return markdownHooks(state.web, { workspace: state.workspace, width: Math.min(w > 0 ? w : 640, 760) });
 }
 
-// step draws one row of a step list; its body is built on first open, so a
+// step draws one row of a card of steps: an icon tile, the verb, what it
+// worked on and how long it took. Its body is built on first open, so a
 // long reply does not render every tool's output up front.
-function step(kind, open, dotIcon, title, time, body) {
+function step(kind, open, tileIcon, verb, arg, ms, body) {
   const det = el('details', { open: !!open },
-    el('summary', {}, svg(ICON.chevron), el('span', { class: 'dot' }, dotIcon),
-      el('span', { class: 'step-title' }, title), el('span', { class: 'step-time' }, time || '')));
-  det.querySelector('summary > svg').classList.add('chev');
+    el('summary', {}, el('span', { class: 'tile' }, tileIcon), el('span', { class: 'verb' }, verb),
+      el('span', { class: 'step-what' }, arg), el('span', { class: 'step-time' }, stepTime(ms))));
   const fill = () => {
     if (det.dataset.filled) return;
     det.dataset.filled = '1';
@@ -703,27 +751,64 @@ function step(kind, open, dotIcon, title, time, body) {
   };
   if (open) fill();
   det.addEventListener('toggle', () => { if (det.open) fill(); });
-  return el('li', { class: 'step ' + kind }, det);
+  return el('li', { class: 'step ' + kind, 'data-ms': String(ms || 0) }, det);
 }
 const isOpen = (n) => !!(n && n.querySelector && n.querySelector('details') && n.querySelector('details').open);
 
 // placePart puts a part's node at the end of a reply body: steps join the
-// step list they follow, text starts a new block.
+// card of steps they follow, text starts a new block.
 function placePart(body, node) {
-  if (node.tagName === 'LI') {
-    let list = body.lastElementChild;
-    if (!list || !list.classList.contains('steps')) body.append(list = el('ol', { class: 'steps' }));
-    list.append(node);
-  } else body.append(node);
+  if (node.tagName !== 'LI') { body.append(node); return; }
+  let card = body.lastElementChild;
+  if (!card || !card.classList.contains('work')) body.append(card = workCard());
+  card.querySelector('.steps').append(node);
 }
 
-// toolIcon is what a tool step shows in its dot: what kind of work it was.
-// The step's state (running, done, failed) is drawn around it by style.css.
-function toolIcon(name) {
+// workCard holds a run of steps under a header that folds them away.
+function workCard() {
+  const head = el('button', { type: 'button', class: 'work-head', 'aria-expanded': 'true' },
+    el('span', { class: 'work-icon', 'aria-hidden': 'true' }), el('span', { class: 'work-text' }), svg(ICON.chevUp));
+  const card = el('div', { class: 'work' }, head, el('ol', { class: 'steps' }));
+  head.addEventListener('click', () => {
+    const folded = card.classList.toggle('folded');
+    head.setAttribute('aria-expanded', String(!folded));
+  });
+  return card;
+}
+
+// refreshWork rewrites the header of every card of steps under root from
+// the steps it holds.
+function refreshWork(root) {
+  for (const card of root.querySelectorAll('.work')) {
+    const steps = [...card.querySelectorAll('.steps > .step')].map((li) => ({
+      status: ['running', 'error', 'think'].find((k) => li.classList.contains(k)) || 'done',
+      ms: Number(li.dataset.ms) || 0,
+    }));
+    const { state, text } = workSummary(steps);
+    if (card.dataset.state !== state) {
+      card.dataset.state = state;
+      card.querySelector('.work-icon').replaceChildren(svg({ running: ICON.sparkle, error: ICON.alert, done: ICON.check }[state]));
+    }
+    card.querySelector('.work-text').textContent = text;
+  }
+}
+
+// mediaCard frames a picture with its title and its file's name.
+function mediaCard(title, file, media, extra = '') {
+  return el('span', { class: ('media-card ' + extra).trim() },
+    el('span', { class: 'media-head' }, el('span', { class: 'media-title' }, title), file ? el('span', { class: 'media-file' }, file) : null),
+    media);
+}
+
+// toolIcon is what a step's tile shows: what kind of work it was. Its
+// state (running, done, failed) is drawn around it by style.css.
+function toolIcon(t) {
+  const name = t.name || '';
   if (name === 'bash') return ICON.terminal;
-  if (name === 'read' || name === 'write') return ICON.file;
-  if (name === 'edit') return ICON.pencil;
-  if (/_agents?$/.test(name || '')) return ICON.agent;
+  if (name === 'read') return ICON.file;
+  if (name === 'write') return /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(describeTool(t).detail) ? ICON.chart : ICON.filePlus;
+  if (name === 'edit') return ICON.edit;
+  if (/_agents?$/.test(name)) return ICON.agent;
   return ICON.tool;
 }
 
@@ -735,7 +820,7 @@ function describeTool(t) {
     case 'bash': return { label: 'Ran', detail: firstLine(a.command) };
     case 'read': return { label: 'Read', detail: path };
     case 'edit': return { label: 'Edited', detail: path };
-    case 'write': return { label: 'Wrote', detail: path };
+    case 'write': return { label: 'Created', detail: path };
     case 'create_agent': return { label: 'Created agent', detail: a.name || '' };
     case 'update_agent': return { label: 'Updated agent', detail: a.name || (agentById(a.id) || {}).name || '' };
     case 'list_agents': return { label: 'Listed agents', detail: '' };
@@ -757,7 +842,6 @@ function toolArgs(t) {
   return JSON.stringify(a, null, 2);
 }
 const firstLine = (s) => String(s || '').trim().split('\n')[0];
-const fmtMs = (ms) => (ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)} s`);
 function logView(title, text, error) {
   const pre = el('pre', {}, String(text).replace(/\n$/, ''));
   const b = el('button', { class: 'code-copy', 'aria-label': `Copy ${title.toLowerCase()}`, title: 'Copy' }, svg(ICON.copy));
@@ -771,12 +855,30 @@ function actionBtn(label, icon, fn) {
   return b;
 }
 
+// decorateCode frames each code block: a header naming its file (or its
+// language) with a Copy key, and line numbers in a gutter beside it. A
+// reply's pictures get a title and their file's name.
 function decorateCode(root) {
   for (const pre of root.querySelectorAll('pre')) {
-    if (pre.querySelector('.code-copy')) continue;
-    const b = el('button', { class: 'code-copy', 'aria-label': 'Copy code', title: 'Copy code' }, svg(ICON.copy));
-    b.addEventListener('click', () => copy(pre.querySelector('code').textContent, b));
-    pre.append(b);
+    if (pre.parentElement.classList.contains('code-body')) continue;
+    const lang = pre.dataset.lang || '', file = pre.dataset.file || '';
+    const code = pre.querySelector('code');
+    const b = el('button', { type: 'button', class: 'code-copy text', 'aria-label': 'Copy code', 'data-label': 'Copy' }, svg(ICON.copy), 'Copy');
+    b.addEventListener('click', () => copy(code.textContent, b));
+    const lines = code.textContent.split('\n').length;
+    const gutter = el('span', { class: 'code-gutter', 'aria-hidden': 'true' }, Array.from({ length: lines }, (_, i) => i + 1).join('\n'));
+    const box = el('div', { class: 'codeblock' },
+      el('div', { class: 'code-head' }, el('span', { class: 'code-file' }, file || lang || 'code'), file && lang ? el('span', { class: 'code-lang' }, lang) : null, b));
+    pre.replaceWith(box);
+    box.append(el('div', { class: 'code-body' }, gutter, pre));
+  }
+  for (const img of root.querySelectorAll('img')) {
+    if (img.closest('.drawing, .media-card')) continue;
+    const src = img.getAttribute('src') || '';
+    let file = src.split('/').pop() || '';
+    try { file = decodeURIComponent(file); } catch {}
+    const card = mediaCard(img.alt || file, img.alt ? file : '', img.cloneNode());
+    img.replaceWith(card);
   }
 }
 
@@ -803,9 +905,10 @@ async function copy(text, btn) {
     t.remove();
   }
   if (btn) {
-    btn.replaceChildren(svg(ICON.check));
+    const label = btn.dataset.label;
+    btn.replaceChildren(svg(ICON.check), ...(label ? ['Copied'] : []));
     btn.classList.add('done');
-    setTimeout(() => { btn.replaceChildren(svg(ICON.copy)); btn.classList.remove('done'); }, 1400);
+    setTimeout(() => { btn.replaceChildren(svg(ICON.copy), ...(label ? [label] : [])); btn.classList.remove('done'); }, 1400);
   }
 }
 
@@ -953,6 +1056,7 @@ async function streamReply(chat, reply, open) {
       nodes[i] = n;
       dirty.delete(i);
     }
+    refreshWork(body);
     scrollToEnd();
     if (dirty.size || upTo < reply.parts.length - 1 || reply.parts.some((p, i) => p && p.type === 'text' && shown[i] < (p.text || '').length)) schedule();
     else last = 0;
@@ -1251,7 +1355,7 @@ function renderComposerAgent() {
   const box = $('composerAgent');
   box.replaceChildren();
   const agent = currentAgent();
-  input.placeholder = agent ? `Ask ${agent.name} anything` : state.chat ? 'Reply' : 'Ask anything, or describe a task';
+  input.placeholder = agent ? `Ask ${agent.name} anything` : state.chat ? 'Reply…' : 'Ask anything, or describe a task';
   if (!agent) return;
   box.append(el('span', {}, agent.name));
   if (!state.chat) box.append(el('button', { class: 'chip-x', type: 'button', 'aria-label': 'Chat without this agent', title: 'Chat without this agent', onclick: () => startChat(null) }, svg(ICON.x)));
@@ -1273,19 +1377,28 @@ function startChat(agent) {
   input.focus();
 }
 
-// showView shows the chat or the settings page, and marks the sidebar
-// entry for where the reader is.
+// showView shows the chat, the Agents page or the settings page, and marks
+// the sidebar entry for where the reader is.
 function showView(view) {
   $('main').hidden = view !== 'chat';
+  $('agentsPage').hidden = view !== 'agents';
   $('settingsPage').hidden = view !== 'settings';
   $('settingsNav').classList.toggle('active', view === 'settings');
   $('settingsNav').toggleAttribute('aria-current', view === 'settings');
-  const fresh = view === 'chat' && !state.chat && !state.draftAgent;
-  $('newChat').classList.toggle('active', fresh);
+  $('agentsHead').toggleAttribute('aria-current', view === 'agents');
+  document.querySelector('.top').classList.toggle('bare', view !== 'chat');
   if (view !== 'chat') { closeDropdown(false); showDrop(false); }
+  renderTitle();
 }
 
 async function route() {
+  if (location.hash === '#settings/agents') { history.replaceState(null, '', '#agents'); }
+  if (location.hash === '#agents') {
+    closeNav(); showView('agents'); renderAgentsPage(); document.title = 'Agents · Harf';
+    // Whether an agent's chat is replying comes from the server, fresh.
+    api('GET', 'api/chats').then((list) => { state.chats = list; renderChats(); }).catch(() => {});
+    return;
+  }
   const s = location.hash.match(/^#settings(?:\/([a-z]+))?$/);
   if (s) { closeNav(); showView('settings'); renderSettings(s[1] || 'appearance'); return; }
   showView('chat');
@@ -1335,12 +1448,12 @@ function toggleSidebar() {
 function renderSidebarControls() {
   const rail = sidebar() === 'rail';
   const c = $('collapseBtn');
-  c.replaceChildren(svg(rail ? ICON.panelOpen : ICON.panelClose));
+  c.replaceChildren(svg(ICON.panel));
   c.setAttribute('aria-label', rail ? 'Expand sidebar' : 'Collapse sidebar');
   c.title = rail ? 'Expand sidebar' : `Collapse sidebar (${keyName('B')} hides it)`;
   c.setAttribute('aria-expanded', String(!rail));
   const m = $('menuBtn');
-  m.replaceChildren(svg(phone.matches ? ICON.menu : ICON.panelOpen));
+  m.replaceChildren(svg(phone.matches ? ICON.menu : ICON.panel));
   m.setAttribute('aria-label', phone.matches ? 'Open menu' : 'Show sidebar');
   m.title = phone.matches ? 'Open menu' : `Show sidebar (${keyName('B')})`;
   m.setAttribute('aria-expanded', String(phone.matches ? $('app').classList.contains('nav-open') : sidebar() !== 'hidden'));
@@ -1356,16 +1469,23 @@ phone.addEventListener('change', () => { closeNav(); renderSidebarControls(); })
 const mac = /Mac|iPhone|iPad/.test(navigator.platform);
 const keyName = (k, shift) => (mac ? `⌘${shift ? '⇧' : ''}${k}` : `Ctrl+${shift ? 'Shift+' : ''}${k}`);
 const keyCaps = (...keys) => el('span', { class: 'keys-list' }, keys.map((k) => el('kbd', { class: 'kbd' }, k)));
-$('searchKeys').replaceChildren(...(mac ? ['⌘', 'K'] : ['Ctrl', 'K']).map((k) => el('kbd', { class: 'kbd' }, k)));
+// The sidebar's quiet key hints. Browsers keep Cmd/Ctrl+N for a new window
+// and never pass it to a page, so a new chat is Cmd/Ctrl+Shift+O.
+$('newChatKeys').textContent = keyName('O', true);
+$('searchKeys').textContent = keyName('K');
+$('settingsKeys').textContent = keyName(',');
+$('newChat').title = `New chat (${keyName('O', true)})`;
 $('searchBtn').setAttribute('aria-label', `Search (${keyName('K')})`);
+$('settingsNav').title = `Settings (${keyName(',')})`;
 $('searchBtn').addEventListener('click', () => palette.open());
 document.addEventListener('keydown', (e) => {
   const mod = mac ? e.metaKey : e.ctrlKey;
   const k = e.key.toLowerCase();
-  if (mod && !e.shiftKey && k === 'k') { e.preventDefault(); closeMenu(); closeAccount(false); closeDropdown(false); palette.isOpen() ? palette.close() : palette.open(); }
+  if (mod && !e.shiftKey && k === 'k') { e.preventDefault(); closeMenu(); closeDropdown(false); palette.isOpen() ? palette.close() : palette.open(); }
+  else if (mod && !e.shiftKey && e.key === ',') { e.preventDefault(); closeMenu(); location.hash = '#settings'; }
   else if (mod && !e.shiftKey && k === 'b') { e.preventDefault(); toggleSidebar(); }
   else if (mod && e.shiftKey && k === 'o') { e.preventDefault(); startChat(null); }
-  else if (e.key === 'Escape' && (menuEl || accountOpen() || palette.isOpen())) { closeMenu(); closeAccount(); }
+  else if (e.key === 'Escape' && (menuEl || palette.isOpen())) closeMenu();
   else if (e.key === 'Escape' && state.streaming) stopReply();
   else if (e.key === 'Escape') closeNav();
 });
@@ -1505,6 +1625,38 @@ $('agentDelete').addEventListener('click', () => {
   dialog.append(menuEl.m);
 });
 
+// ---------- the Agents page ----------
+// A card for each agent: what it does, the tools and servers it may use,
+// how many chats it has and whether one is replying now. A card starts a
+// chat with its agent; its pencil edits it.
+function renderAgentsPage() {
+  const grid = $('agentGrid');
+  if ($('agentsPage').hidden) return;
+  const enabled = state.mcp.filter((m) => m.enabled).map((m) => m.name);
+  const cards = state.agents.map((a) => {
+    const { chats, running } = agentActivity(a.id, state.chats.map((c) => (c.id === state.streamingChat ? { ...c, replying: true } : c)));
+    const go = el('button', { type: 'button', class: 'agent-card-go', onclick: () => startChat(a) },
+      el('span', { class: 'agent-name' }, a.name));
+    const edit = el('button', { type: 'button', class: 'icon-btn agent-card-edit', 'aria-label': `Edit ${a.name}`, title: `Edit ${a.name}`, onclick: () => openAgent(a) }, svg(ICON.edit));
+    return el('li', { class: 'agent-tile' },
+      el('div', { class: 'agent-tile-top' },
+        el('span', { class: 'agent-icon', 'aria-hidden': 'true' }, svg(ICON.bot)),
+        el('span', { class: 'agent-state' + (running ? ' running' : '') }, el('span', { class: 'state-dot', 'aria-hidden': 'true' }), running ? 'running' : 'idle'),
+        edit),
+      go,
+      el('p', { class: 'agent-desc' }, a.description || 'No description'),
+      el('ul', { class: 'agent-tags', 'aria-label': 'Tools and servers' }, agentTags(a, enabled).map((t) => el('li', {}, t))),
+      el('div', { class: 'agent-foot' }, el('span', {}, `${chats} ${chats === 1 ? 'chat' : 'chats'}`), el('span', {}, editedLabel(a.updatedAt))));
+  });
+  const add = el('li', { class: 'agent-tile add' },
+    el('button', { type: 'button', class: 'agent-add', onclick: () => openAgent(null) },
+      el('span', { class: 'add-box', 'aria-hidden': 'true' }, svg(ICON.plus)),
+      el('span', { class: 'add-title' }, 'Create an agent'),
+      el('span', { class: 'add-line' }, 'Give it instructions, a model and tools, then chat with it anytime.')));
+  grid.replaceChildren(...cards, add);
+}
+$('createAgentBtn').addEventListener('click', () => openAgent(null));
+
 // ---------- plugins ----------
 const PART = { attach: 'Attach button', 'workspace-images': 'Images in replies', chart: 'Chart blocks', svg: 'SVG blocks', 'agent-card': 'Agent cards in replies' };
 
@@ -1588,7 +1740,6 @@ function imageModelPicker() {
 const SECTIONS = [
   { id: 'appearance', label: 'Appearance', icon: ICON.swatch },
   { id: 'plugins', label: 'Plugins', icon: ICON.plug },
-  { id: 'agents', label: 'Agents', icon: ICON.agent },
   { id: 'mcp', label: 'MCP servers', icon: ICON.server },
   { id: 'about', label: 'About', icon: ICON.info },
 ];
@@ -1600,7 +1751,7 @@ function renderSettings(section) {
   document.title = `${SECTIONS.find((s) => s.id === section).label} · Settings · Harf`;
   $('settingsNavTabs').replaceChildren(...SECTIONS.map((s) => el('a', { href: `#settings/${s.id}`, 'aria-current': s.id === section ? 'page' : null },
     svg(s.icon), s.label)));
-  const body = { appearance: appearanceCard, plugins: pluginsCard, agents: agentsCard, mcp: mcpCard, about: aboutCard }[section]();
+  const body = { appearance: appearanceCard, plugins: pluginsCard, mcp: mcpCard, about: aboutCard }[section]();
   $('settingsBody').replaceChildren(...[body].flat());
 }
 
@@ -1641,7 +1792,7 @@ function appearanceCard() {
     b.addEventListener('click', () => save({ accent: a.id }));
     return b;
   }));
-  const picker = el('input', { type: 'color', value: custom || '#3d63dd', 'aria-label': 'Custom accent colour' });
+  const picker = el('input', { type: 'color', value: custom || '#3f6212', 'aria-label': 'Custom accent colour' });
   picker.addEventListener('change', () => save({ accent: picker.value }));
   swatches.append(el('label', { class: 'custom-color' + (custom ? ' on' : ''), title: 'Pick any colour' }, picker, custom ? custom : 'Custom'));
   return card({ title: 'Appearance', sub: 'Changes apply at once and are kept in this browser.' },
@@ -1658,22 +1809,6 @@ function appearanceCard() {
 function pluginsCard() {
   return card({ title: 'Plugins', sub: 'Plugins add to what the model is told and to how replies are shown. Turning one off takes it out of new replies; old replies show plain text where it drew something.' },
     pluginRows());
-}
-
-function agentsCard() {
-  const add = el('button', { type: 'button', class: 'btn sm primary', onclick: () => openAgent(null) }, svg(ICON.plus), 'New agent');
-  const rows = state.agents.length
-    ? el('ul', { class: 'agent-rows' }, state.agents.map((a) => {
-      const row = el('li', { class: 'agent-row' },
-        el('div', { class: 'agent-text' }, el('b', {}, a.name), el('p', {}, a.description || 'No description')),
-        el('div', { class: 'agent-actions' },
-          el('button', { type: 'button', class: 'btn sm', onclick: () => startChat(a) }, svg(ICON.chat), 'Chat'),
-          el('button', { type: 'button', class: 'btn sm ghost', onclick: () => openAgent(a), 'aria-label': `Edit ${a.name}` }, svg(ICON.edit), 'Edit')));
-      row.style.setProperty('--agent', agentColor(a));
-      return row;
-    }))
-    : el('p', { class: 'empty-note' }, 'No agents yet. An agent is a model with a role and instructions that apply to every message in its chats.');
-  return card({ title: 'Agents', sub: 'Each agent keeps its own instructions, model and tools.', action: add }, rows);
 }
 
 function aboutCard() {
@@ -1848,62 +1983,25 @@ const mcpItems = (m) => [
 
 // ---------- the signed-in person ----------
 // api/me answers 200 with { username, name }, or 204 when nobody is known;
-// then, or on any error, there is no avatar.
-let me = null;
+// then, or on any error, the sidebar shows no one. The card shows the
+// name's first letter, the name, and the username under it when the two
+// differ.
 async function loadMe() {
   try {
     const res = await fetch('api/me');
     if (res.status !== 200) return;
     const p = await res.json();
-    if (!p || !(p.name || p.username)) return;
-    me = p;
-    const b = $('avatarBtn');
-    b.replaceChildren(beam(p.username || p.name));
-    b.setAttribute('aria-label', `Account: ${p.name || p.username}`);
-    b.title = p.name || p.username;
-    $('userMenu').hidden = false;
+    const name = p && (p.name || p.username);
+    if (!name) return;
+    $('userAvatar').textContent = [...name.trim()][0].toUpperCase();
+    $('userName').textContent = name;
+    const sub = p.username && p.username !== name ? p.username : '';
+    $('userSub').textContent = sub;
+    $('userSub').hidden = !sub;
+    $('userCard').title = sub ? `${name} (${sub})` : name;
+    $('userCard').hidden = false;
   } catch {}
 }
-const accountMenu = $('accountMenu');
-const accountOpen = () => !accountMenu.hidden;
-function openAccount() {
-  const items = [];
-  const item = (label, icon, fn) => {
-    const b = el('button', { type: 'button', role: 'menuitem' }, svg(icon), label);
-    b.addEventListener('click', () => { closeAccount(false); fn(); });
-    items.push(b);
-    return b;
-  };
-  accountMenu.replaceChildren(
-    el('div', { class: 'menu-head', role: 'presentation' },
-      el('span', { class: 'menu-avatar', 'aria-hidden': 'true' }, beam(me.username || me.name)),
-      el('span', { class: 'menu-who' }, el('span', { class: 'menu-name' }, me.name || me.username), me.name && me.username && me.username !== me.name ? el('span', { class: 'menu-user' }, me.username) : null)),
-    item('Settings', ICON.settings, () => { location.hash = '#settings'; }));
-  accountMenu.hidden = false;
-  const r = $('avatarBtn').getBoundingClientRect();
-  accountMenu.style.top = r.bottom + 8 + 'px';
-  accountMenu.style.right = Math.max(8, innerWidth - r.right) + 'px';
-  $('avatarBtn').setAttribute('aria-expanded', 'true');
-  accountMenu.items = items;
-  items[0].focus();
-}
-function closeAccount(refocus = true) {
-  if (accountMenu.hidden) return;
-  accountMenu.hidden = true;
-  $('avatarBtn').setAttribute('aria-expanded', 'false');
-  if (refocus) $('avatarBtn').focus();
-}
-$('avatarBtn').addEventListener('click', () => (accountOpen() ? closeAccount() : openAccount()));
-accountMenu.addEventListener('keydown', (e) => {
-  const items = accountMenu.items || [];
-  const i = items.indexOf(document.activeElement);
-  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
-  else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
-  else if (e.key === 'Tab') closeAccount(false);
-});
-document.addEventListener('pointerdown', (e) => {
-  if (accountOpen() && !accountMenu.contains(e.target) && !$('avatarBtn').contains(e.target)) closeAccount(false);
-});
 
 // ---------- command palette ----------
 const icon = (paths) => () => svg(paths);
@@ -1936,7 +2034,7 @@ function settingItems() {
     { id: 's-appearance', label: 'Appearance', keywords: ['theme', 'font', 'text size', 'accent colour', 'color', 'sidebar'], icon: icon(ICON.swatch), run: () => { location.hash = '#settings/appearance'; } },
     { id: 's-plugins', label: 'Plugins settings', keywords: ['plugins'], icon: icon(ICON.plug), run: () => { location.hash = '#settings/plugins'; } },
     { id: 's-images', label: 'Image generation', keywords: ['image model', 'pictures', 'images'], icon: icon(ICON.image), run: () => { location.hash = '#settings/plugins'; setTimeout(() => { const b = $('imageModelBtn'); if (b) b.focus(); }); } },
-    { id: 's-agents', label: 'Manage agents', keywords: ['agents', 'edit agent'], icon: icon(ICON.agent), run: () => { location.hash = '#settings/agents'; } },
+    { id: 's-agents', label: 'Manage agents', keywords: ['agents', 'edit agent'], icon: icon(ICON.agent), run: () => { location.hash = '#agents'; } },
     { id: 's-mcp', label: 'MCP servers', keywords: ['mcp', 'servers', 'tools'], icon: icon(ICON.server), run: () => { location.hash = '#settings/mcp'; } },
     { id: 's-about', label: 'About Harf', keywords: ['version', 'shortcuts', 'workspace'], icon: icon(ICON.info), run: () => { location.hash = '#settings/about'; } },
   ];

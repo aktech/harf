@@ -30,72 +30,73 @@
       <button class="collapse-btn" id="collapseBtn" type="button" aria-controls="sidebar"></button>
     </div>
 
-    <button class="search-trigger" id="searchBtn" type="button" aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <span class="search-trigger-text">Search</span>
-      <span class="search-trigger-keys" id="searchKeys" aria-hidden="true"></span>
-    </button>
-    <button class="new-chat" id="newChat" type="button" title="New chat">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.85z"/></svg>
+    <button class="new-chat" id="newChat" type="button" aria-keyshortcuts="Meta+Shift+O Control+Shift+O">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 21h8"/><path d="m15 5 4 4"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
       <span class="lbl">New chat</span>
-      <svg class="new-chat-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="go-up" d="M12 12V5"/><path class="go-down" d="M12 12v7"/></svg>
+      <span class="hint-keys" id="newChatKeys" aria-hidden="true"></span>
+    </button>
+    <button class="search-trigger" id="searchBtn" type="button" aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+      <span class="search-trigger-text">Search</span>
+      <span class="hint-keys" id="searchKeys" aria-hidden="true"></span>
     </button>
 
     <div class="side-scroll">
       <section class="side-sec" aria-labelledby="agentsHead">
-        <h2 class="nav-sec" id="agentsHead">
-          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>Agents</span>
-          <button class="icon-btn sec-add" id="newAgent" type="button" aria-label="New agent" title="New agent">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <h2 class="nav-sec">
+          <a class="lbl" id="agentsHead" href="#agents">Agents</a>
+          <button class="sec-add" id="newAgent" type="button" aria-label="New agent" title="New agent">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
           </button>
         </h2>
         <ul class="agent-list" id="agentList"></ul>
       </section>
-      <section class="side-sec chats-sec" aria-labelledby="chatsHead">
-        <h2 class="nav-sec" id="chatsHead">
-          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/></svg>Chats</span>
-        </h2>
-        <nav class="chat-list" id="chatList" aria-label="Chats"></nav>
-      </section>
+      <nav class="chat-list" id="chatList" aria-label="Chats"></nav>
     </div>
 
     <a class="side-version" id="sideVersion" hidden></a>
-    <nav class="nav nav-foot" aria-label="Settings">
-      <a href="#settings" id="settingsNav" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Settings</span></a>
-    </nav>
+    <div class="side-foot">
+      <a class="settings-link" href="#settings" id="settingsNav" aria-keyshortcuts="Meta+Comma Control+Comma">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="lbl">Settings</span>
+        <span class="hint-keys" id="settingsKeys" aria-hidden="true"></span>
+      </a>
+      <div class="user-card" id="userCard" hidden>
+        <span class="user-avatar" id="userAvatar" aria-hidden="true"></span>
+        <span class="user-who"><span class="user-name" id="userName"></span><span class="user-sub" id="userSub" hidden></span></span>
+      </div>
+    </div>
   </aside>
   <div class="scrim" id="scrim"></div>
 
   <div class="app-col">
     <header class="top">
       <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-controls="sidebar"></button>
+      <div class="top-title" id="topTitle"></div>
       <div class="top-actions">
-        <button class="icon-btn" id="themeBtn" type="button"></button>
-        <div class="user-menu" id="userMenu" hidden>
-          <button class="avatar-btn" id="avatarBtn" type="button" aria-haspopup="menu" aria-expanded="false"></button>
-        </div>
+        <button class="share-btn" id="shareBtn" type="button" aria-haspopup="menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg>
+          <span class="lbl">Share</span>
+        </button>
+        <button class="icon-btn theme-btn" id="themeBtn" type="button"></button>
       </div>
     </header>
 
     <main class="chat" id="main">
-      <div class="chat-head">
-        <div class="chat-title" id="chatTitle"></div>
-      </div>
-
       <div class="scroller" id="scroller">
         <div class="thread" id="thread"></div>
       </div>
 
       <div class="composer-wrap">
         <button class="jump" id="jump" hidden aria-label="Jump to latest">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
         </button>
         <form class="composer" id="composer">
           <ul class="tray" id="tray" aria-label="Files to send" hidden></ul>
           <textarea id="input" rows="3" placeholder="Ask anything, or describe a task" aria-label="Message"></textarea>
           <div class="composer-row">
-            <button class="icon-btn attach" id="attachBtn" type="button" aria-label="Attach files" title="Attach files" hidden>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            <button class="attach" id="attachBtn" type="button" aria-label="Attach files" title="Attach files" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             </button>
             <input type="file" id="fileInput" multiple hidden>
             <span class="composer-agent" id="composerAgent"></span>
@@ -105,8 +106,8 @@
             </button>
             <span class="spacer"></span>
             <button class="send" id="sendBtn" type="submit" aria-label="Send">
-              <svg class="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
-              <svg class="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+              <svg class="i-send" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+              <svg class="i-stop" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
             </button>
           </div>
         </form>
@@ -115,10 +116,23 @@
       </div>
 
       <div class="drop-hint" id="dropHint" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
         <span id="dropText">Drop files to attach them</span>
       </div>
     </main>
+
+    <section class="page agents-page" id="agentsPage" aria-labelledby="agentsTitle" hidden>
+      <div class="page-inner">
+        <div class="page-head">
+          <div>
+            <h1 id="agentsTitle">Agents</h1>
+            <p class="page-sub">Agents keep their own instructions, model and tools.</p>
+          </div>
+          <button class="btn accent" id="createAgentBtn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Create an agent</button>
+        </div>
+        <ul class="agent-grid" id="agentGrid" aria-label="Agents"></ul>
+      </div>
+    </section>
 
     <section class="page" id="settingsPage" aria-labelledby="settingsTitle" hidden>
       <div class="page-inner">
@@ -132,17 +146,16 @@
 
 <div class="select-pop" id="modelPop" hidden>
   <div class="select-search">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
     <input id="modelFilter" type="text" role="combobox" aria-expanded="true" aria-controls="modelList" aria-autocomplete="list" aria-label="Filter models" placeholder="Filter models" autocomplete="off" spellcheck="false">
   </div>
   <div class="select-list" id="modelList" role="listbox" aria-label="Models"></div>
 </div>
 
-<div class="menu account-menu" id="accountMenu" role="menu" aria-label="Account" hidden></div>
 
 <dialog class="pal" id="palette" aria-label="Search and commands">
   <div class="pal-search">
-    <svg class="pal-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <svg class="pal-search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
     <input id="palInput" type="text" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list" aria-label="Search chats, agents, actions and settings" placeholder="Search chats, agents, actions, settings" autocomplete="off" spellcheck="false">
   </div>
   <div class="pal-list" id="palList" role="listbox" aria-label="Results"></div>

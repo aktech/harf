@@ -1,7 +1,12 @@
-The icons chart-column, lightbulb, message-square-text, sparkle, wand-sparkles, pencil-line, pin, pin-off,
-download, trash-2, x, check, plug-zap, arrow-up, file, file-text,
-file-spreadsheet, file-image, file-code, file-archive, file-audio and
-file-video in web/app.js and web/index.html are from
-lucide-static 1.63.0 on npm (tarball sha256
+Every icon in web/app.js and web/index.html is from lucide-static 1.63.0
+on npm (tarball sha256
 521f0d535c03b159c6ea9b475920724dee2755005ad7360fd621b9bab7bf211d), ISC licence
-in lucide-LICENSE.txt.
+in lucide-LICENSE.txt: arrow-down, arrow-up, bot, box, chart-column, check,
+chevron-down, chevron-up, circle-alert, copy, download, ellipsis, file,
+file-archive, file-audio, file-code, file-image, file-plus, file-spreadsheet,
+file-text, file-video, image, info, lightbulb, link, menu, message-square-text,
+monitor, moon, palette, panel-left, panel-left-close, panel-left-open, pencil,
+pencil-line, pin, pin-off, plug, plug-zap, plus, rotate-cw, search, server,
+settings, share, sparkle, sun, terminal, trash-2, upload, wand-sparkles,
+wrench
+and x. The stop key's filled square is a plain rectangle.
