@@ -1,0 +1,7 @@
+The icons chart-column, lightbulb, message-square-text, sparkle, wand-sparkles, pencil-line, pin, pin-off,
+download, trash-2, x, check, plug-zap, arrow-up, file, file-text,
+file-spreadsheet, file-image, file-code, file-archive, file-audio and
+file-video in web/app.js and web/index.html are from
+lucide-static 1.63.0 on npm (tarball sha256
+521f0d535c03b159c6ea9b475920724dee2755005ad7360fd621b9bab7bf211d), ISC licence
+in lucide-LICENSE.txt.

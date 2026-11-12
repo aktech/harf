@@ -1,0 +1,7 @@
+package: @highlightjs/cdn-assets (the browser build of highlight.js, common languages)
+version: 11.12.0
+tarball: https://registry.npmjs.org/@highlightjs/cdn-assets/-/cdn-assets-11.12.0.tgz
+tarball sha256: b8a006d30f45afe783072569f3d69c5b60c0e7b9ca28cd474e12f2584e2a3bd9
+files (sha256, path in the tarball):
+  8ab71eb09c51f501e5e25157d9cff100e46cc29bcbfc744d0b746d451fca7f53  highlight.min.js
+  6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490  LICENSE

@@ -1,0 +1,7 @@
+package: markdown-it-footnote
+version: 4.0.0
+tarball: https://registry.npmjs.org/markdown-it-footnote/-/markdown-it-footnote-4.0.0.tgz
+tarball sha256: 319e1c784b74a73b473e76a1bb725d3770c5a2e409dfd8c30c504f3a2712e272
+files (sha256, path in the tarball):
+  d6fee58a3b56c5742fa18f3e01f1d317cc99975683ebd39c9195cb2aff0c2e42  dist/markdown-it-footnote.min.js
+  81d61236a5f25294b2dad0c866d4ad6a40b865148b28df9a71f49ba771a6c54b  LICENSE

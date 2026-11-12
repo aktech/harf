@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harf</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="mask-icon" href="safari-pinned-tab.svg" color="#141414">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#F3EFE8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="side" id="sidebar" aria-label="Sidebar">
+    <div class="brand">
+      <a class="brand-home" href="#" aria-label="Harf, new chat" title="New chat">
+        <img class="brand-mark brand-on-light" src="brand/harf-mark-ink.svg" alt="">
+        <img class="brand-mark brand-on-dark" src="brand/harf-mark-paper.svg" alt="">
+        <img class="brand-word brand-on-light" src="brand/harf-wordmark-black.svg" alt="">
+        <img class="brand-word brand-on-dark" src="brand/harf-wordmark-paper.svg" alt="">
+      </a>
+      <button class="collapse-btn" id="collapseBtn" type="button" aria-controls="sidebar"></button>
+    </div>
+
+    <button class="search-trigger" id="searchBtn" type="button" aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span class="search-trigger-text">Search</span>
+      <span class="search-trigger-keys" id="searchKeys" aria-hidden="true"></span>
+    </button>
+    <button class="new-chat" id="newChat" type="button" title="New chat">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.85z"/></svg>
+      <span class="lbl">New chat</span>
+      <svg class="new-chat-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path class="go-up" d="M12 12V5"/><path class="go-down" d="M12 12v7"/></svg>
+    </button>
+
+    <div class="side-scroll">
+      <section class="side-sec" aria-labelledby="agentsHead">
+        <h2 class="nav-sec" id="agentsHead">
+          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>Agents</span>
+          <button class="icon-btn sec-add" id="newAgent" type="button" aria-label="New agent" title="New agent">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </h2>
+        <ul class="agent-list" id="agentList"></ul>
+      </section>
+      <section class="side-sec chats-sec" aria-labelledby="chatsHead">
+        <h2 class="nav-sec" id="chatsHead">
+          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M7 11h10"/><path d="M7 15h6"/><path d="M7 7h8"/></svg>Chats</span>
+        </h2>
+        <nav class="chat-list" id="chatList" aria-label="Chats"></nav>
+      </section>
+    </div>
+
+    <a class="side-version" id="sideVersion" hidden></a>
+    <nav class="nav nav-foot" aria-label="Settings">
+      <a href="#settings" id="settingsNav" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl">Settings</span></a>
+    </nav>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="app-col">
+    <header class="top">
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-controls="sidebar"></button>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" type="button"></button>
+        <div class="user-menu" id="userMenu" hidden>
+          <button class="avatar-btn" id="avatarBtn" type="button" aria-haspopup="menu" aria-expanded="false"></button>
+        </div>
+      </div>
+    </header>
+
+    <main class="chat" id="main">
+      <div class="chat-head">
+        <div class="chat-title" id="chatTitle"></div>
+      </div>
+
+      <div class="scroller" id="scroller">
+        <div class="thread" id="thread"></div>
+      </div>
+
+      <div class="composer-wrap">
+        <button class="jump" id="jump" hidden aria-label="Jump to latest">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        </button>
+        <form class="composer" id="composer">
+          <ul class="tray" id="tray" aria-label="Files to send" hidden></ul>
+          <textarea id="input" rows="3" placeholder="Ask anything, or describe a task" aria-label="Message"></textarea>
+          <div class="composer-row">
+            <button class="icon-btn attach" id="attachBtn" type="button" aria-label="Attach files" title="Attach files" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <input type="file" id="fileInput" multiple hidden>
+            <span class="composer-agent" id="composerAgent"></span>
+            <button class="select-trigger model-trigger" id="modelBtn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Model">
+              <span class="select-logo" id="modelLogo"></span><span class="select-value" id="modelValue"></span>
+              <svg class="select-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <span class="spacer"></span>
+            <button class="send" id="sendBtn" type="submit" aria-label="Send">
+              <svg class="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+              <svg class="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+            </button>
+          </div>
+        </form>
+        <div class="starters" id="starters"></div>
+        <div class="warning" id="warning" hidden></div>
+      </div>
+
+      <div class="drop-hint" id="dropHint" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5"/><path d="M5 14.5v3A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5v-3"/></svg>
+        <span id="dropText">Drop files to attach them</span>
+      </div>
+    </main>
+
+    <section class="page" id="settingsPage" aria-labelledby="settingsTitle" hidden>
+      <div class="page-inner">
+        <h1 id="settingsTitle">Settings</h1>
+        <nav class="subnav" id="settingsNavTabs" aria-label="Settings sections"></nav>
+        <div class="settings-body" id="settingsBody"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="select-pop" id="modelPop" hidden>
+  <div class="select-search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="modelFilter" type="text" role="combobox" aria-expanded="true" aria-controls="modelList" aria-autocomplete="list" aria-label="Filter models" placeholder="Filter models" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="select-list" id="modelList" role="listbox" aria-label="Models"></div>
+</div>
+
+<div class="menu account-menu" id="accountMenu" role="menu" aria-label="Account" hidden></div>
+
+<dialog class="pal" id="palette" aria-label="Search and commands">
+  <div class="pal-search">
+    <svg class="pal-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="palInput" type="text" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list" aria-label="Search chats, agents, actions and settings" placeholder="Search chats, agents, actions, settings" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="pal-list" id="palList" role="listbox" aria-label="Results"></div>
+  <div class="pal-foot">
+    <span class="pal-hint"><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd>Move</span>
+    <span class="pal-hint"><kbd class="kbd">↵</kbd>Open</span>
+    <span class="pal-foot-end pal-hint"><kbd class="kbd">Esc</kbd>Close</span>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="agentDialog">
+  <form method="dialog" id="agentForm">
+    <h2 id="agentDialogTitle">New agent</h2>
+    <label class="field">
+      <span>Name</span>
+      <input name="name" required maxlength="60" placeholder="Code reviewer" autocomplete="off">
+    </label>
+    <label class="field">
+      <span>What it does</span>
+      <input name="description" maxlength="140" placeholder="Reads a diff and points out bugs" autocomplete="off">
+    </label>
+    <label class="field">
+      <span>Instructions</span>
+      <textarea name="systemPrompt" rows="7" placeholder="You review code. Point out bugs first, then risky patterns. Quote the line you mean."></textarea>
+    </label>
+    <div class="field-row">
+      <div class="field grow">
+        <span id="agentModelLabel">Model</span>
+        <input type="hidden" name="model">
+        <button type="button" class="select-trigger boxed" id="agentModelBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="agentModelLabel agentModelBtn">
+          <span class="select-logo" id="agentModelLogo"></span><span class="select-value" id="agentModelValue"></span>
+          <svg class="select-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <label class="field temp-field">
+        <span>Thinking</span>
+        <select name="thinking">
+          <option value="">Default</option>
+          <option value="off">Off</option>
+          <option value="minimal">Minimal</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="xhigh">Extra high</option>
+        </select>
+      </label>
+    </div>
+    <fieldset class="field tools-field">
+      <legend>MCP servers</legend>
+      <div class="tool-checks" id="agentMcp"></div>
+    </fieldset>
+    <fieldset class="field tools-field">
+      <legend>Tools it may use</legend>
+      <div class="tool-checks">
+        <label class="check"><input type="checkbox" name="tool-read"><span><b>Read</b> files</span></label>
+        <label class="check"><input type="checkbox" name="tool-bash"><span><b>Run</b> shell commands</span></label>
+        <label class="check"><input type="checkbox" name="tool-edit"><span><b>Edit</b> files</span></label>
+        <label class="check"><input type="checkbox" name="tool-write"><span><b>Write</b> new files</span></label>
+      </div>
+    </fieldset>
+    <div class="sheet-actions">
+      <button type="button" class="btn ghost danger" id="agentDelete"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete agent</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="agentCancel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>Cancel</button>
+      <button type="submit" class="btn primary" id="agentSave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Save agent</button>
+    </div>
+  </form>
+</dialog>
+
+
+
+<dialog class="sheet" id="mcpDialog">
+  <form method="dialog" id="mcpForm">
+    <h2 id="mcpDialogTitle">Add MCP server</h2>
+    <div class="field-row">
+      <label class="field grow">
+        <span>Name</span>
+        <input name="name" required maxlength="60" pattern="[A-Za-z0-9_\-]+" placeholder="github" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="field temp-field">
+        <span>Connects by</span>
+        <select name="kind">
+          <option value="stdio">A command</option>
+          <option value="url">A URL</option>
+        </select>
+      </label>
+    </div>
+    <div class="mcp-kind" data-kind="stdio">
+      <label class="field">
+        <span>Command</span>
+        <input name="command" placeholder="npx" autocomplete="off" spellcheck="false">
+        <span class="hint">Runs on this machine as the user running Harf. One program, not a shell line.</span>
+      </label>
+      <label class="field">
+        <span>Arguments <span class="hint">one per line</span></span>
+        <textarea name="args" rows="3" spellcheck="false" placeholder="-y&#10;@modelcontextprotocol/server-everything"></textarea>
+      </label>
+      <label class="field">
+        <span>Environment <span class="hint">KEY=value, one per line</span></span>
+        <textarea name="env" rows="3" spellcheck="false" placeholder="API_KEY=..."></textarea>
+      </label>
+    </div>
+    <div class="mcp-kind" data-kind="url" hidden>
+      <label class="field">
+        <span>URL</span>
+        <input name="url" type="url" placeholder="https://mcp.example.com/mcp" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="field">
+        <span>Headers <span class="hint">Name: value, one per line</span></span>
+        <textarea name="headers" rows="3" spellcheck="false" placeholder="Authorization: Bearer ..."></textarea>
+      </label>
+    </div>
+    <p class="field-note">Saved values are hidden. Leave a hidden value as it is to keep it.</p>
+    <div class="mcp-result" id="mcpResult" role="status" hidden></div>
+    <div class="sheet-actions">
+      <button type="button" class="btn ghost danger" id="mcpDelete"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete server</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="mcpCancel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>Cancel</button>
+      <button type="button" class="btn" id="mcpTest"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/><path d="m2 22 3-3"/><path d="M7.5 13.5 10 11"/><path d="M10.5 16.5 13 14"/><path d="m18 3-4 4h6l-4 4"/></svg>Test</button>
+      <button type="submit" class="btn primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Save server</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script defer src="vendor/markdown-it/markdown-it.umd.min.js"></script>
+<script defer src="vendor/markdown-it-footnote/markdown-it-footnote.min.js"></script>
+<script defer src="vendor/mdit-plugin-tasklist/cdn.umd.js"></script>
+<script defer src="vendor/katex/katex.min.js"></script>
+<script defer src="vendor/markdown-it-texmath/texmath.js"></script>
+<script defer src="vendor/highlight.js/highlight.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
