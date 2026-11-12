@@ -205,8 +205,12 @@ svg { flex: none; }
   background: var(--surface); color: var(--text-2);
 }
 .keys { display: inline-flex; gap: 4px; }
-/* A key hint in a row: quiet text, no keycap. */
-.hint-keys { margin-left: auto; font: 400 var(--fs-3xs)/1 var(--font-mono); color: var(--text-3); white-space: nowrap; }
+/* A key hint in a row: a small keycap with room around its letters. */
+.hint-keys {
+  margin-left: auto; padding: 4px 7px; border-radius: 6px; white-space: nowrap; letter-spacing: .04em;
+  font: 500 var(--fs-xs)/1 -apple-system, BlinkMacSystemFont, var(--font-sans); color: var(--text-2);
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+}
 
 /* ---------- shell: sidebar and top bar ---------- */
 .app { display: grid; grid-template-columns: var(--side-w) minmax(0, 1fr); height: 100dvh; transition: grid-template-columns .2s ease; }
@@ -242,18 +246,18 @@ svg { flex: none; }
 
 /* New chat: a filled ink key with its shortcut at the right. */
 .new-chat {
-  display: flex; align-items: center; gap: 11px; width: 100%; height: 40px; padding: 0 12px 0 13px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 11px; width: 100%; height: 40px; padding: 0 8px 0 13px; margin-bottom: 8px;
   border: 0; border-radius: var(--radius-sm); background-color: var(--ink); color: var(--on-ink);
   font-size: var(--fs-md); font-weight: 500; text-align: left; white-space: nowrap;
 }
 .new-chat svg { width: 17px; height: 17px; stroke-width: 1.7; }
 .new-chat .lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.new-chat .hint-keys { color: var(--on-ink-2); }
+.new-chat .hint-keys { color: color-mix(in srgb, var(--on-ink) 82%, transparent); background: color-mix(in srgb, var(--on-ink) 14%, transparent); }
 .new-chat:active { transform: translateY(1px); }
 
 /* Search: a filled field that opens the command palette. */
 .search-trigger {
-  display: flex; align-items: center; gap: 11px; width: 100%; height: 38px; padding: 0 14px 0 14px;
+  display: flex; align-items: center; gap: 11px; width: 100%; height: 38px; padding: 0 8px 0 14px;
   border: 0; border-radius: var(--radius-sm); background-color: var(--surface-2); color: var(--text-2); font-size: var(--fs-md);
 }
 .search-trigger svg { width: 15px; height: 15px; stroke-width: 2; }
@@ -318,7 +322,7 @@ input.rename {
 .side-foot { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); display: grid; gap: 6px; }
 .side-version:not([hidden]) + .side-foot { margin-top: 0; }
 .settings-link {
-  display: flex; align-items: center; gap: 11px; height: 36px; padding: 0 12px 0 11px; border-radius: 8px;
+  display: flex; align-items: center; gap: 11px; height: 36px; padding: 0 8px 0 11px; border-radius: 8px;
   color: var(--text); font-size: var(--fs-md); text-decoration: none; white-space: nowrap;
 }
 .settings-link svg { width: 17px; height: 17px; stroke-width: 1.6; color: var(--text-2); }
