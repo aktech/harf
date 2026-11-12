@@ -16,7 +16,8 @@
 @font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-600-normal.woff2) format('woff2'); font-weight: 600; font-display: swap; }
 @font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
 /* Fira Code 5.3.0, latin, from the @fontsource/fira-code npm package, for
-   the reply stats; licence in fonts/fira-code-OFL.txt. */
+   code, the reply stats and other monospace text; licence in
+   fonts/fira-code-OFL.txt. */
 @font-face { font-family: 'Fira Code'; src: url(fonts/fira-code-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Fira Code'; src: url(fonts/fira-code-latin-500-normal.woff2) format('woff2'); font-weight: 500; font-display: swap; }
 /* Urbanist 1.303, the brand's typeface; licence in fonts/urbanist-OFL.txt. */
@@ -30,19 +31,13 @@
   font-weight: 100 700;
   font-display: swap;
 }
-@font-face {
-  font-family: 'Cascadia Code';
-  src: url(fonts/cascadia-code.woff2) format('woff2');
-  font-weight: 200 700;
-  font-display: swap;
-}
 
 /* Design tokens: sage paper, a slightly deeper panel for the sidebar,
    hairline borders, and near-black ink as the accent. */
 :root {
   --font-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-ui: var(--font-side, 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif);
-  --font-mono: 'Cascadia Code', ui-monospace, Menlo, monospace;
+  --font-mono: 'Fira Code', ui-monospace, Menlo, monospace;
   --font-stats: var(--font-mono);
   /* The brand face, kept for Settings' font choice. */
   --font-display: var(--font-sans);
