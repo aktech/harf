@@ -2,9 +2,15 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { appearanceVars, ACCENTS, choices, withDefaults } from './appearance.js';
 
-test('the defaults change nothing: Geist, the normal size, the theme accent', () => {
+test('the defaults change nothing: Fira Sans, IBM Plex Sans in the sidebar, the normal size, ink', () => {
   assert.deepEqual(appearanceVars({}), {});
-  assert.deepEqual(appearanceVars({ font: 'geist', size: 'default', accent: 'default' }), {});
+  assert.deepEqual(appearanceVars({ font: 'fira', sideFont: 'plex', size: 'default', accent: 'default' }), {});
+  assert.equal(ACCENTS.find((a) => a.id === 'default').label, 'Ink');
+});
+
+test('Geist and the forest green are choices', () => {
+  assert.match(appearanceVars({ font: 'geist' })['--font-sans'], /^'Geist',/);
+  assert.equal(appearanceVars({ accent: 'forest' })['--accent-pick'], ACCENTS.find((a) => a.id === 'forest').color);
 });
 
 test('Google Sans is a choice', () => {
@@ -16,8 +22,8 @@ test('the old default accent, cobalt, is still a choice', () => {
   assert.equal(appearanceVars({ accent: 'cobalt' })['--accent-pick'], cobalt.color);
 });
 
-test('Fira Sans is a choice', () => {
-  assert.match(appearanceVars({ font: 'fira' })['--font-sans'], /^'Fira Sans',/);
+test('Google Sans is a choice in the sidebar too', () => {
+  assert.match(appearanceVars({ sideFont: 'google' })['--font-side'], /^'Google Sans',/);
 });
 
 test('a font and a size choice become custom properties', () => {
@@ -39,23 +45,22 @@ test('unknown or malformed values fall back to the defaults', () => {
 });
 
 test('only choices that differ from the defaults are kept, so a new default reaches everyone else', () => {
-  assert.deepEqual(choices({ font: 'geist', size: 'default', accent: 'default' }), {});
-  assert.deepEqual(choices({ font: 'fira', size: 'default', accent: '#12ab9f' }), { font: 'fira', accent: '#12ab9f' });
+  assert.deepEqual(choices({ font: 'fira', sideFont: 'plex', size: 'default', accent: 'default' }), {});
+  assert.deepEqual(choices({ font: 'geist', size: 'default', accent: '#12ab9f' }), { font: 'geist', accent: '#12ab9f' });
 });
 
 test('a sidebar font choice sets its own property and leaves the main font alone', () => {
-  const v = appearanceVars({ font: 'geist', sideFont: 'urbanist' });
+  const v = appearanceVars({ font: 'fira', sideFont: 'urbanist' });
   assert.match(v['--font-side'], /^'Urbanist',/);
   assert.equal(v['--font-sans'], undefined);
-  // Geist is the sidebar's default, so choosing it sets nothing; Google
-  // Sans there is a choice like any other.
-  assert.deepEqual(appearanceVars({ sideFont: 'geist' }), {});
-  assert.match(appearanceVars({ sideFont: 'google' })['--font-side'], /^'Google Sans',/);
+  // IBM Plex Sans is the sidebar's default, so choosing it sets nothing.
+  assert.deepEqual(appearanceVars({ sideFont: 'plex' }), {});
+  assert.match(appearanceVars({ sideFont: 'geist' })['--font-side'], /^'Geist',/);
   assert.deepEqual(appearanceVars({ sideFont: 'comic' }), {});
 });
 
 test('a saved font with no sidebar font keeps the sidebar in that font', () => {
   assert.equal(withDefaults({ font: 'fira' }).sideFont, 'fira');
   assert.equal(withDefaults({ font: 'fira', sideFont: 'plex' }).sideFont, 'plex');
-  assert.equal(withDefaults({}).sideFont, 'geist');
+  assert.equal(withDefaults({}).sideFont, 'plex');
 });

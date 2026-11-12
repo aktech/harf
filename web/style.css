@@ -38,10 +38,10 @@
 }
 
 /* Design tokens: sage paper, a slightly deeper panel for the sidebar,
-   hairline borders, near-black ink for what is chosen, one forest green. */
+   hairline borders, and near-black ink as the accent. */
 :root {
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-ui: var(--font-side, 'Geist', -apple-system, BlinkMacSystemFont, sans-serif);
+  --font-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-ui: var(--font-side, 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif);
   --font-mono: 'Cascadia Code', ui-monospace, Menlo, monospace;
   --font-stats: var(--font-mono);
   /* The brand face, kept for Settings' font choice. */
@@ -59,9 +59,9 @@
   --border: #dee0d9; --border-strong: #c9ccc2;
   --text: #181912; --text-2: #575951; --text-3: #63655d; --text-4: #a3a59d;
   --ink: #181912; --on-ink: #fdfefb; --on-ink-2: #a3a59d;
-  --accent: #3f6212; --accent-soft: #e3e9d8; --accent-text: #3f6212; --mark: #3f6212; --on-accent: #ffffff;
+  --accent: #181912; --accent-soft: #e9eae4; --accent-text: #181912; --mark: #181912; --on-accent: #ffffff;
   --hover: rgba(24, 25, 18, .05); --hover-ink: rgba(255, 255, 255, .12);
-  --ok: #3f6212; --ok-soft: #e3e9d8; --warn: #9a5b00; --warn-soft: #f8eedb; --err: #b4232f; --err-soft: #f8e6e5; --info: #3f6212; --info-soft: #e3e9d8;
+  --ok: #3f6212; --ok-soft: #e3e9d8; --warn: #9a5b00; --warn-soft: #f8eedb; --err: #b4232f; --err-soft: #f8e6e5; --info: #181912; --info-soft: #e9eae4;
   --shadow: none;
   --shadow-lg: 0 16px 48px rgba(24, 25, 18, .16), 0 2px 6px rgba(24, 25, 18, .06);
   --shadow-composer: 0 6px 24px -8px rgba(24, 25, 18, .12), 0 1px 2px rgba(24, 25, 18, .04);
@@ -82,9 +82,9 @@
     --border: #2e302a; --border-strong: #46483f;
     --text: #ecede6; --text-2: #b4b6ac; --text-3: #989a8f; --text-4: #62645c;
     --ink: #ecede6; --on-ink: #181912; --on-ink-2: #6a6c64;
-    --accent: #a3c77d; --accent-soft: #263219; --accent-text: #a9cf82; --mark: #4d7a1c; --on-accent: #ffffff;
+    --accent: #ecede6; --accent-soft: #2a2b26; --accent-text: #ecede6; --mark: #ecede6; --on-accent: #181912;
     --hover: rgba(255, 255, 255, .05); --hover-ink: rgba(24, 25, 18, .1);
-    --ok: #a3c77d; --ok-soft: #263219; --warn: #e8b25a; --warn-soft: #2e2512; --err: #f27b74; --err-soft: #3a1b19; --info: #a3c77d; --info-soft: #263219;
+    --ok: #a3c77d; --ok-soft: #263219; --warn: #e8b25a; --warn-soft: #2e2512; --err: #f27b74; --err-soft: #3a1b19; --info: #ecede6; --info-soft: #2a2b26;
     --shadow-lg: 0 16px 48px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
     --shadow-composer: 0 8px 28px -10px rgba(0, 0, 0, .55), 0 1px 2px rgba(0, 0, 0, .3);
     --scrim: rgba(0, 0, 0, .56);
@@ -103,9 +103,9 @@
   --border: #2e302a; --border-strong: #46483f;
   --text: #ecede6; --text-2: #b4b6ac; --text-3: #989a8f; --text-4: #62645c;
   --ink: #ecede6; --on-ink: #181912; --on-ink-2: #6a6c64;
-  --accent: #a3c77d; --accent-soft: #263219; --accent-text: #a9cf82; --mark: #4d7a1c; --on-accent: #ffffff;
+  --accent: #ecede6; --accent-soft: #2a2b26; --accent-text: #ecede6; --mark: #ecede6; --on-accent: #181912;
   --hover: rgba(255, 255, 255, .05); --hover-ink: rgba(24, 25, 18, .1);
-  --ok: #a3c77d; --ok-soft: #263219; --warn: #e8b25a; --warn-soft: #2e2512; --err: #f27b74; --err-soft: #3a1b19; --info: #a3c77d; --info-soft: #263219;
+  --ok: #a3c77d; --ok-soft: #263219; --warn: #e8b25a; --warn-soft: #2e2512; --err: #f27b74; --err-soft: #3a1b19; --info: #ecede6; --info-soft: #2a2b26;
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
   --shadow-composer: 0 8px 28px -10px rgba(0, 0, 0, .55), 0 1px 2px rgba(0, 0, 0, .3);
   --scrim: rgba(0, 0, 0, .56);
@@ -517,7 +517,7 @@ input.rename {
 .msg.assistant { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 14px; }
 .msg-mark {
   width: 28px; height: 28px; margin-top: -2px; border-radius: 7px; display: grid; place-items: center;
-  background: var(--mark); color: #fff;
+  background: var(--mark); color: var(--on-accent);
 }
 .msg-mark svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
 .msg-main { min-width: 0; }

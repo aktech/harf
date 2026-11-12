@@ -21,9 +21,9 @@ export const SIZES = [
 // Light-theme colours, each at least 4.5:1 on white; the dark theme lightens
 // the chosen colour (style.css).
 export const ACCENTS = [
-  { id: 'default', label: 'Forest', color: '#3f6212' },
+  { id: 'default', label: 'Ink', color: '#141414' },
+  { id: 'forest', label: 'Forest', color: '#3f6212' },
   { id: 'cobalt', label: 'Cobalt', color: '#3d63dd' },
-  { id: 'ink', label: 'Ink', color: '#141414' },
   { id: 'violet', label: 'Violet', color: '#6e4fd8' },
   { id: 'teal', label: 'Teal', color: '#0b7a75' },
   { id: 'green', label: 'Green', color: '#1d7f45' },
@@ -57,7 +57,7 @@ export function appearanceVars({ font, sideFont, size, accent } = {}) {
   return out;
 }
 
-export const DEFAULTS = { font: 'geist', sideFont: 'geist', size: 'default', accent: 'default' };
+export const DEFAULTS = { font: 'fira', sideFont: 'plex', size: 'default', accent: 'default' };
 
 // The custom properties appearanceVars can set; theme.js lists the same.
 export const VARS = ['--font-sans', '--font-side', '--fs-scale', '--accent-pick'];
