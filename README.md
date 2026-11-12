@@ -19,9 +19,9 @@
 </p>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/chat-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/chat-light.png">
-  <img src="docs/screenshots/chat-light.png" alt="A Harf chat: Pi lists the steps it took (writing population.py, running it), shows the Python script, then draws a bar chart of the 10 largest countries by population. The sidebar lists an agent and recent chats.">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/home-light.png">
+  <img src="docs/screenshots/home-light.png" alt="The Harf home page: a greeting with sample prompts above the chat box, and a sidebar with an agent, recent chats and settings.">
 </picture>
 
 For each chat Harf runs `pi --mode rpc` and streams Pi's answer to the browser. Pi works in a workspace folder, so a chat can do real work, not just talk.
