@@ -373,6 +373,13 @@ input.rename {
 .title-btn svg { width: 14px; height: 14px; stroke-width: 2; color: var(--text-2); transition: transform .12s ease; }
 .title-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
 .top-title input.rename { max-width: 420px; }
+.back-btn { margin-left: -8px; margin-right: 6px; color: var(--text-2); }
+.back-btn:hover { color: var(--text); }
+.crumbs { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: var(--fs-md); }
+.crumb { color: var(--text-2); text-decoration: none; white-space: nowrap; }
+a.crumb:hover { color: var(--text); }
+.crumb[aria-current] { color: var(--text); font-weight: 500; }
+.crumb-sep { color: var(--text-3, var(--text-2)); }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 14px; }
 
 /* Menus: a raised sheet of 34px rows. */

@@ -49,6 +49,7 @@ const ICON = {
   redo: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
   dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
   chevDown: '<path d="m6 9 6 6 6-6"/>',
+  arrowLeft: '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
   chevUp: '<path d="m18 15-6-6-6 6"/>',
   terminal: '<path d="M12 19h8"/><path d="m4 17 6-6-6-6"/>',
   file: '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/>',
@@ -388,7 +389,7 @@ function renderTitle() {
   const c = state.chat;
   const agent = currentAgent();
   document.title = c && c.title ? `${c.title} · Harf` : 'Harf';
-  if (!$('agentsPage').hidden || !$('settingsPage').hidden) { t.replaceChildren(); return; }
+  if (!$('agentsPage').hidden || !$('settingsPage').hidden) { t.replaceChildren(...crumbs()); return; }
   if (!c) { t.replaceChildren(agent ? el('span', { class: 'top-name' }, agent.name) : ''); return; }
   const b = el('button', { type: 'button', class: 'title-btn', 'aria-haspopup': 'menu', 'aria-expanded': 'false', title: 'Chat options' },
     el('span', { class: 'top-name' }, c.title || 'New chat'), svg(ICON.chevDown));
@@ -399,6 +400,19 @@ function renderTitle() {
   });
   b.addEventListener('pointerdown', (e) => e.stopPropagation());
   t.replaceChildren(b);
+}
+
+// crumbs is the top bar on the Agents and settings pages: a way back to the
+// chat the reader left, then where they are.
+function crumbs() {
+  const back = el('a', { class: 'icon-btn back-btn', href: backTo || '#', 'aria-label': 'Back to chat', title: 'Back to chat' }, svg(ICON.arrowLeft));
+  if (!backTo) back.addEventListener('click', newChat);
+  const sep = () => el('span', { class: 'crumb-sep', 'aria-hidden': 'true' }, '/');
+  const trail = !$('agentsPage').hidden
+    ? [el('span', { class: 'crumb', 'aria-current': 'page' }, 'Agents')]
+    : [el('a', { class: 'crumb', href: '#settings' }, 'Settings'), sep(),
+      el('span', { class: 'crumb', 'aria-current': 'page' }, SECTIONS.find((x) => x.id === settingsSection).label)];
+  return [back, el('nav', { class: 'crumbs', 'aria-label': 'You are here' }, ...trail)];
 }
 
 function renderModels() {
@@ -1388,6 +1402,9 @@ function showView(view) {
   renderTitle();
 }
 
+// backTo is the chat the reader was on before the Agents or settings page.
+let backTo = '';
+
 async function route() {
   closeMenu();
   if (location.hash === '#settings/agents') { history.replaceState(null, '', '#agents'); }
@@ -1398,7 +1415,8 @@ async function route() {
     return;
   }
   const s = location.hash.match(/^#settings(?:\/([a-z]+))?$/);
-  if (s) { closeNav(); showView('settings'); renderSettings(s[1] || 'appearance'); return; }
+  if (s) { closeNav(); renderSettings(s[1] || 'appearance'); showView('settings'); return; }
+  backTo = /^#c=/.test(location.hash) ? location.hash : '';
   showView('chat');
   const m = location.hash.match(/^#c=([0-9a-f]+)$/);
   if (!m) { if (state.chat) startChat(null); else { renderThread(); showView('chat'); } return; }
