@@ -606,6 +606,38 @@ func TestReopenedChatFollowsTheReplyStillBeingWritten(t *testing.T) {
 	}
 }
 
+func TestChatListSaysWhichChatsAreReplying(t *testing.T) {
+	h := newHarness(t, echo)
+	h.agent.block, h.agent.started = make(chan struct{}), make(chan struct{})
+	busy := h.newChat(map[string]any{})
+	idle := h.newChat(map[string]any{})
+	go h.send(busy.ID, map[string]any{"content": "one"})
+	<-h.agent.started
+	unblock := sync.OnceFunc(func() { close(h.agent.block) })
+	defer unblock()
+
+	var list []struct {
+		ID       string
+		Replying bool
+	}
+	h.do("GET", "/api/chats", nil, &list)
+	got := map[string]bool{}
+	for _, c := range list {
+		got[c.ID] = c.Replying
+	}
+	if !got[busy.ID] || got[idle.ID] {
+		t.Fatalf("replying %v, want only %s", got, busy.ID)
+	}
+	unblock()
+	h.waitReply(busy.ID)
+	h.do("GET", "/api/chats", nil, &list)
+	for _, c := range list {
+		if c.Replying {
+			t.Fatalf("%s still replying after its reply ended", c.ID)
+		}
+	}
+}
+
 func TestEmptyMessageIsRefused(t *testing.T) {
 	h := newHarness(t, echo)
 	c := h.newChat(map[string]any{})

@@ -258,8 +258,19 @@ func me(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"username": name, "name": name})
 }
 
+// listChats lists the chats without their messages, each saying whether
+// a reply is being written for it right now.
 func (s *Server) listChats(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, s.store.ListChats())
+	type summary struct {
+		store.Chat
+		Replying bool `json:"replying"`
+	}
+	chats := s.store.ListChats()
+	out := make([]summary, len(chats))
+	for i, c := range chats {
+		out[i] = summary{c, s.current(c.ID) != nil}
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 func (s *Server) updateChat(w http.ResponseWriter, r *http.Request) {
