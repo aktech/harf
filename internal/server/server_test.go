@@ -934,3 +934,67 @@ func (h *harness) release(slow chan struct{}) {
 		time.Sleep(5 * time.Millisecond)
 	}
 }
+
+func TestAChatIsNamedAsSoonAsItsFirstMessageIsSent(t *testing.T) {
+	h := newHarness(t, echo)
+	h.agent.block, h.agent.started = make(chan struct{}), make(chan struct{})
+	c := h.newChat(map[string]any{})
+	go h.send(c.ID, map[string]any{"content": "Plan a three day trip to Lisbon"})
+	<-h.agent.started
+	defer close(h.agent.block)
+
+	// The reply has not come yet, but the chat already has a name.
+	if got := h.chat(c.ID).Title; got != "Plan a three day" {
+		t.Fatalf("title while replying %q", got)
+	}
+}
+
+func TestAStoppedFirstReplyKeepsTheNameFromTheMessage(t *testing.T) {
+	h := newHarness(t, func(pi.Spec) pi.Result { return pi.Result{Error: "Stopped"} })
+	h.agent.title = "Lisbon Trip"
+	c := h.newChat(map[string]any{})
+	h.send(c.ID, map[string]any{"content": "Plan a three day trip to Lisbon"})
+	if got := h.chat(c.ID).Title; got != "Plan a three day" {
+		t.Fatalf("title %q", got)
+	}
+}
+
+func TestARenameWhileReplyingIsNotReplacedByTheTitle(t *testing.T) {
+	h := newHarness(t, echo)
+	h.agent.title = "Lisbon Trip"
+	h.agent.block, h.agent.started = make(chan struct{}), make(chan struct{})
+	c := h.newChat(map[string]any{})
+	done := make(chan struct{})
+	go func() { h.send(c.ID, map[string]any{"content": "Plan a three day trip to Lisbon"}); close(done) }()
+	<-h.agent.started
+	h.do("PATCH", "/api/chats/"+c.ID, map[string]any{"title": "My trip"}, nil)
+	close(h.agent.block)
+	<-done
+	if got := h.chat(c.ID).Title; got != "My trip" {
+		t.Fatalf("title %q", got)
+	}
+}
+
+func TestChatsWithMessagesButNoNameAreNamedAtStart(t *testing.T) {
+	dir := t.TempDir()
+	st, err := store.Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := st.CreateChat(store.Chat{Model: "fake/small"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := st.AppendMessage(c.ID, store.Message{Role: "user", Content: "What can you do for me today"}); err != nil {
+		t.Fatal(err)
+	}
+	empty, _ := st.CreateChat(store.Chat{Model: "fake/small"})
+
+	h := serve(t, dir, t.TempDir(), fstest.MapFS{}, &fakeAgent{reply: echo}, "fake/small")
+	if got := h.chat(c.ID).Title; got != "What can you do" {
+		t.Fatalf("title %q", got)
+	}
+	if got := h.chat(empty.ID).Title; got != "" {
+		t.Fatalf("an empty chat got a title %q", got)
+	}
+}

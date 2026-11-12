@@ -122,8 +122,51 @@ func (s *Server) sendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	started = true
+	// A chat is named from its first message at once, so it never shows as
+	// "New chat" while it has content; the model's title replaces this name
+	// after the first reply, unless the chat was renamed meanwhile.
+	if chat.Title == "" {
+		if name := nameFrom(ask); name != "" {
+			if _, err := s.store.UpdateChat(id, store.ChatPatch{Title: &name}); err == nil {
+				rep.send("title", map[string]string{"title": name})
+			}
+		}
+	}
 	go s.write(ctx, rep, id, chat, ask, spec)
 	rep.follow(w, r)
+}
+
+// nameFrom is a chat's name before the model has titled it: the first words
+// of the message, or the first attached file's name.
+func nameFrom(ask store.Message) string {
+	if ask.Content != "" {
+		return firstWords(firstLine(ask.Content), titleWords)
+	}
+	if len(ask.Attachments) > 0 {
+		return clip(ask.Attachments[0].Name, 60)
+	}
+	return ""
+}
+
+// nameUntitled names, from their first message, the chats that have
+// messages but no title (cut off before a reply finished, or from before
+// names were given at once).
+func nameUntitled(st *store.Store) {
+	for _, c := range st.ListChats() {
+		if c.Title != "" {
+			continue
+		}
+		full, err := st.GetChat(c.ID)
+		if err != nil {
+			continue
+		}
+		for _, m := range full.Messages {
+			if name := nameFrom(m); m.Role == "user" && name != "" {
+				st.UpdateChat(c.ID, store.ChatPatch{Title: &name})
+				break
+			}
+		}
+	}
 }
 
 // write runs Pi for the reply, saves it and names the chat after its first
@@ -161,12 +204,10 @@ func (s *Server) write(ctx context.Context, rep *reply, id string, chat store.Ch
 		if !spec.ImageOnly { // an image model writes no text
 			title = s.makeTitle(ctx, chat.Model, strings.TrimSpace(question), saved.Content)
 		}
-		if title == "" && ask.Content != "" {
-			title = firstWords(firstLine(ask.Content), titleWords)
-		} else if title == "" && len(ask.Attachments) > 0 {
-			title = clip(ask.Attachments[0].Name, 60)
-		}
-		if title != "" {
+		// Replace the name given from the message only while it is still
+		// that name: a rename during the reply wins.
+		now, err := s.store.GetChat(id)
+		if title != "" && err == nil && now.Title == nameFrom(ask) {
 			if _, err := s.store.UpdateChat(id, store.ChatPatch{Title: &title}); err == nil {
 				rep.send("title", map[string]string{"title": title})
 			}

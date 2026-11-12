@@ -47,6 +47,7 @@ func New(st *store.Store, agent Agent, defaultModel, workspace string, ui fs.FS)
 	s := &Server{store: st, agent: agent, defaultModel: defaultModel, workspace: workspace, mux: http.NewServeMux(), replying: map[string]*reply{}}
 	s.models.keep(st, "models")
 	removeHalfUploads(workspace)
+	nameUntitled(st)
 	s.imageModels.keep(st, "image-models")
 	// Asking Pi for its models takes from a fraction of a second to tens of
 	// seconds; ask now so the first page load does not wait for it.

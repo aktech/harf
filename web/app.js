@@ -1185,12 +1185,18 @@ const scroller = $('scroller');
 function scrollToEnd(force) {
   if (force) state.follow = true;
   if (state.follow) scroller.scrollTop = scroller.scrollHeight;
-  $('jump').hidden = state.follow;
+  showJump();
+}
+const atEnd = () => scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 40;
+// showJump shows the jump-to-latest key only in a chat taller than the
+// screen, scrolled away from its end.
+function showJump() {
+  const tall = scroller.scrollHeight > scroller.clientHeight + 40;
+  $('jump').hidden = !state.chat || !tall || atEnd();
 }
 scroller.addEventListener('scroll', () => {
-  const atEnd = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 40;
-  state.follow = atEnd;
-  $('jump').hidden = atEnd || !state.chat;
+  state.follow = atEnd();
+  showJump();
 });
 $('jump').addEventListener('click', () => { state.follow = true; scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }); });
 
