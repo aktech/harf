@@ -2,7 +2,7 @@
 
 CI publishes `ghcr.io/aktech/harf` for `linux/amd64` and `linux/arm64`: `:main` and `:sha-<commit>` from every push to `main`, and `:<version>`, `:<major>.<minor>` and `:latest` from every `v*` tag.
 
-The image holds Harf, Pi 1.4.0, bash, git, ripgrep and fd on Debian 13 slim. It runs as a non-root user and points everything at `/home/user`:
+The image holds Harf, Pi 1.4.0, bash, git, ripgrep, fd, curl, python3 and jq on Debian 13 slim. It runs as a non-root user and points everything at `/home/user`:
 
 - `HOME=/home/user`, so Pi keeps its settings in `/home/user/.pi/agent`.
 - `HARF_DATA=/home/user/.harf` and `HARF_WORKSPACE=/home/user/workspace`.

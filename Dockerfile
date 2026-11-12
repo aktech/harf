@@ -5,13 +5,17 @@
 FROM debian:trixie-20261104-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
 
 # ripgrep and fd-find are on PATH so Pi's grep and find tools never download
-# their own copies at run time.
+# their own copies at run time. curl, python3 (with https) and jq let Pi's
+# bash tool fetch and read data from the web.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       ca-certificates=20250419+deb13u1 \
-      git=1:2.47.3-0+deb13u1 \
-      ripgrep=14.1.1-1+b4 \
+      curl=8.14.1-2+deb13u7 \
       fd-find=10.2.0-1+b5 \
+      git=1:2.47.3-0+deb13u1 \
+      jq=1.7.1-6+deb13u4 \
+      python3=3.13.5-1 \
+      ripgrep=14.1.1-1+b4 \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /home/user \
  && chmod 1777 /home/user
