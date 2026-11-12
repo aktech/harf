@@ -1392,6 +1392,7 @@ function showView(view) {
 }
 
 async function route() {
+  closeMenu();
   if (location.hash === '#settings/agents') { history.replaceState(null, '', '#agents'); }
   if (location.hash === '#agents') {
     closeNav(); showView('agents'); renderAgentsPage(); document.title = 'Agents · Harf';
@@ -1654,7 +1655,13 @@ function renderAgentsPage() {
       el('span', { class: 'add-title' }, 'Create an agent'),
       el('span', { class: 'add-line' }, 'Give it instructions, a model and tools, then chat with it anytime.')));
   grid.replaceChildren(...cards, add);
+  // While a chat is replying, look again shortly so its card settles to idle.
+  clearTimeout(agentsPoll);
+  if (state.chats.some((c) => c.replying)) {
+    agentsPoll = setTimeout(() => api('GET', 'api/chats').then((list) => { state.chats = list; renderChats(); }).catch(() => {}), 5000);
+  }
 }
+let agentsPoll = 0;
 $('createAgentBtn').addEventListener('click', () => openAgent(null));
 
 // ---------- plugins ----------
