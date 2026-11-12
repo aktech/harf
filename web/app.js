@@ -1,3 +1,4 @@
+import { beam } from './avatar.js';
 import { renderMarkdown, settle } from './md.js';
 import { markdownHooks, toolImage, fileURL, workspacePath } from './plugins.js';
 import { mountFrames } from './frames.js';
@@ -1975,8 +1976,8 @@ const mcpItems = (m) => [
 // ---------- the signed-in person ----------
 // api/me answers 200 with { username, name }, or 204 when nobody is known;
 // then, or on any error, the sidebar shows no one. The card shows the
-// name's first letter, the name, and the username under it when the two
-// differ.
+// person's generated face, the name, and the username under it when the
+// two differ.
 async function loadMe() {
   try {
     const res = await fetch('api/me');
@@ -1984,7 +1985,9 @@ async function loadMe() {
     const p = await res.json();
     const name = p && (p.name || p.username);
     if (!name) return;
-    $('userAvatar').textContent = [...name.trim()][0].toUpperCase();
+    // The same generated face as on the platform it runs behind, from the
+    // username (stable) or the name.
+    $('userAvatar').replaceChildren(beam(p.username || name));
     $('userName').textContent = name;
     const sub = p.username && p.username !== name ? p.username : '';
     $('userSub').textContent = sub;

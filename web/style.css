@@ -332,6 +332,7 @@ input.rename {
   width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center;
   background: var(--surface-2); color: var(--accent-text); font: 600 var(--fs-xs)/1 var(--font-ui);
 }
+.user-avatar svg { display: block; width: 100%; height: 100%; stroke: none; }
 .user-who { display: grid; min-width: 0; line-height: 1.25; }
 .user-name { font-size: var(--fs-sm); font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-sub { font: 400 var(--fs-3xs)/1.4 var(--font-mono); color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
