@@ -2,9 +2,18 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { appearanceVars, ACCENTS, choices, withDefaults } from './appearance.js';
 
-test('the defaults change nothing: Google Sans, the normal size, the theme accent', () => {
+test('the defaults change nothing: Geist, the normal size, the theme accent', () => {
   assert.deepEqual(appearanceVars({}), {});
-  assert.deepEqual(appearanceVars({ font: 'google', size: 'default', accent: 'default' }), {});
+  assert.deepEqual(appearanceVars({ font: 'geist', size: 'default', accent: 'default' }), {});
+});
+
+test('Google Sans is a choice', () => {
+  assert.match(appearanceVars({ font: 'google' })['--font-sans'], /^'Google Sans',/);
+});
+
+test('the old default accent, cobalt, is still a choice', () => {
+  const cobalt = ACCENTS.find((a) => a.id === 'cobalt');
+  assert.equal(appearanceVars({ accent: 'cobalt' })['--accent-pick'], cobalt.color);
 });
 
 test('Fira Sans is a choice', () => {
@@ -30,19 +39,18 @@ test('unknown or malformed values fall back to the defaults', () => {
 });
 
 test('only choices that differ from the defaults are kept, so a new default reaches everyone else', () => {
-  assert.deepEqual(choices({ font: 'google', size: 'default', accent: 'default' }), {});
+  assert.deepEqual(choices({ font: 'geist', size: 'default', accent: 'default' }), {});
   assert.deepEqual(choices({ font: 'fira', size: 'default', accent: '#12ab9f' }), { font: 'fira', accent: '#12ab9f' });
 });
 
 test('a sidebar font choice sets its own property and leaves the main font alone', () => {
-  const v = appearanceVars({ font: 'google', sideFont: 'urbanist' });
+  const v = appearanceVars({ font: 'geist', sideFont: 'urbanist' });
   assert.match(v['--font-side'], /^'Urbanist',/);
   assert.equal(v['--font-sans'], undefined);
   // Geist is the sidebar's default, so choosing it sets nothing; Google
   // Sans there is a choice like any other.
   assert.deepEqual(appearanceVars({ sideFont: 'geist' }), {});
   assert.match(appearanceVars({ sideFont: 'google' })['--font-side'], /^'Google Sans',/);
-  assert.match(appearanceVars({ font: 'geist' })['--font-sans'], /^'Geist',/);
   assert.deepEqual(appearanceVars({ sideFont: 'comic' }), {});
 });
 
