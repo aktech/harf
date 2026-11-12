@@ -590,7 +590,7 @@ input.rename {
 .work.folded .steps { display: none; }
 .step summary {
   list-style: none; cursor: pointer;
-  display: grid; grid-template-columns: 24px 76px minmax(0, 1fr) auto; align-items: center;
+  display: grid; grid-template-columns: 24px auto minmax(0, 1fr) auto; align-items: center;
   column-gap: 12px; min-height: 38px; padding: 0 15px;
   font-size: var(--fs-sm); color: var(--text-2);
 }
@@ -602,14 +602,22 @@ input.rename {
 }
 .step .tile svg { width: 13px; height: 13px; stroke-width: 1.9; }
 .step.error .tile { color: var(--err); background: var(--err-soft); }
-.step.running .tile { color: var(--accent); }
+/* A running step's tile holds a spinning ring in place of its icon. */
+.step.running .tile svg { display: none; }
 .step.running .tile::after {
-  content: ''; position: absolute; inset: -2px; border-radius: 8px;
-  border: 1.5px solid transparent; border-top-color: var(--accent); animation: spin .9s linear infinite;
+  content: ''; width: 12px; height: 12px; box-sizing: border-box; border-radius: 50%;
+  border: 1.75px solid color-mix(in srgb, var(--accent) 22%, transparent); border-top-color: var(--accent);
+  animation: spin .9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes breathe { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); } }
-.verb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Every row's verb column is as wide as the longest built-in verb, whatever
+   the font, so the arguments line up; the hidden lines set that width. A
+   longer tool name widens its own row, up to a cap. */
+.verb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 14em; }
+.verb::before, .verb::after { display: block; height: 0; visibility: hidden; }
+.verb::before { content: 'Updated agent'; }
+.verb::after { content: 'Listed agents'; }
 .step-what { min-width: 0; display: flex; }
 .step-what .arg { font: var(--fs-xs)/1.4 var(--font-mono); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .step-what .peek { color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -1080,7 +1088,7 @@ input.rename {
   .msg.assistant { column-gap: 10px; grid-template-columns: 24px minmax(0, 1fr); }
   .msg-mark { width: 24px; height: 24px; border-radius: 6px; margin-top: 0; }
   .msg-mark svg { width: 15px; height: 15px; }
-  .step summary { grid-template-columns: 24px auto minmax(0, 1fr) auto; padding: 0 12px; column-gap: 10px; }
+  .step summary { padding: 0 12px; column-gap: 10px; }
   .step-body { padding: 4px 12px 12px; }
   .step > :is(.media-card, .agent-card) { margin: 2px 12px 10px; }
   .msg.user .bubble, .edit-box, .attachments { max-width: 92%; }
